@@ -85,11 +85,13 @@ DAT.Globe = function(container, opts) {
   var padding = 40;
   var PI_HALF = Math.PI / 2;
 
-  var sphereGeo;
+  var sphereGeo, fontGeo;
+  var cities = [];
   
   var projector;
   
   var mouseDownOn = false;
+  var lastTimeMouseMoved = 0;
   
   function init() {
 
@@ -124,7 +126,7 @@ DAT.Globe = function(container, opts) {
     sphereGeo = new THREE.Mesh(geometry, material);
     sphereGeo.rotation.y = Math.PI;
     scene.add(sphereGeo);
-
+	
     shader = Shaders['atmosphere'];
     uniforms = THREE.UniformsUtils.clone(shader.uniforms);
 
@@ -191,7 +193,7 @@ DAT.Globe = function(container, opts) {
           lat = data[i + 1];
           lng = data[i + 2];
           color = colorFnWrapper(data,i);
-          addPoint(lat, lng, city, color, this._baseGeometry);
+          addPoint(lat, lng, city, color, this._baseGeometry, false);
         }
       }
       if(this._morphTargetId === undefined) {
@@ -208,7 +210,7 @@ DAT.Globe = function(container, opts) {
       lat = data[i + 1];
       lng = data[i + 2];
       color = colorFnWrapper(data,i);
-      addPoint(lat, lng, city, color, subgeo);
+      addPoint(lat, lng, city, color, subgeo, true);
     }
     if (opts.animated) {
       this._baseGeometry.morphTargets.push({'name': opts.name, vertices: subgeo.vertices});
@@ -271,16 +273,14 @@ DAT.Globe = function(container, opts) {
 	
 	textGeo.position.multiplyScalar(1.001);
 	
-	// TODO
-	var lookat = new THREE.Vector3(textGeo.position.x, textGeo.position.y, textGeo.position.z);
+	var lookat = textGeo.position.clone();
 	lookat = lookat.multiplyScalar(2);
 	textGeo.lookAt(lookat);
 	
 	scene.add(textGeo);
-	
   }
   
-  function addPoint(lat, lng, city, color, subgeo) {
+  function addPoint(lat, lng, city, color, subgeo, record) {
 
     var phi = (90 - lat) * Math.PI / 180;
     var theta = (180 - lng) * Math.PI / 180;
@@ -296,6 +296,10 @@ DAT.Globe = function(container, opts) {
 
 	drawText(city, color, phi, theta);
 	
+	if (record) {
+		cities.push({'position': point.position.clone(), 'name': city});
+	}
+
     for (var i = 0; i < point.geometry.faces.length; i++) {
 
       point.geometry.faces[i].color = color;
@@ -321,6 +325,31 @@ DAT.Globe = function(container, opts) {
 	return null;
   }
   
+  function findClosestCity(point) {
+	point.sub(mesh.position).normalize();
+	
+	var city;
+	var i, index = -1, best;
+	var dist;
+	
+	for (i = 0; i < cities.length; i += 1) {
+		city = cities[i].position.clone();
+		city.sub(mesh.position).normalize();
+		
+		dist = city.dot(point);
+		
+		if (index === -1 || dist > best) {
+			index = i;
+			best = dist;
+		} 
+	}
+
+	if (index === -1 || dist < 0.9999) {
+		return null;
+	}
+	return cities[index].name;
+  }
+  
   function onMouseDown(event) {
     event.preventDefault();
 
@@ -344,15 +373,26 @@ DAT.Globe = function(container, opts) {
 		mouse.x = - event.clientX;
 		mouse.y = event.clientY;
 
-		var zoomDamp = distance/1000;
+		var zoomDamp = distance / 1000;
 
 		target.x = targetOnDown.x + (mouse.x - mouseOnDown.x) * 0.005 * zoomDamp;
 		target.y = targetOnDown.y + (mouse.y - mouseOnDown.y) * 0.005 * zoomDamp;
 
 		target.y = target.y > PI_HALF ? PI_HALF : target.y;
 		target.y = target.y < - PI_HALF ? - PI_HALF : target.y;
+		
 	} else {
-	
+		lastTimeMouseMoved = new Date().getTime();
+		var timer = setTimeout(function() {
+			var currentTime = new Date().getTime();
+			if (currentTime - lastTimeMouseMoved > 400) {
+				var intersectPoint = objectPick(event);
+				if (intersectPoint !== null) {
+					findClosestCity(intersectPoint);
+				}
+			}
+		}, 410);
+		
 	}	
   }
 
