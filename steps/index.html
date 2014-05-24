@@ -133,12 +133,14 @@
       console.log(globe);
       var i, tweens = [];
       
+	  /*
       var settime = function(globe, t) {
         return function() {
           new TWEEN.Tween(globe).to({time: t/tags.length},500).easing(TWEEN.Easing.Cubic.EaseOut).start();
         };
       };
-     
+     */
+
       var xhr;
       TWEEN.start();
       
@@ -153,8 +155,6 @@
             for (i=0;i<data.length;i++) {
 				globe.addData(data[i][1], {name: data[i][0], animated: true});
             }
-            globe.createPoints();
-            settime(globe, 0)();
             globe.animate();
             document.body.style.backgroundImage = 'none'; // remove loading
           }

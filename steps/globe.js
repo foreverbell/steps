@@ -74,6 +74,7 @@ DAT.Globe = function(container, opts) {
 	var camera, scene, renderer, w, h;
 	var mesh, atmosphere, point;
 	var sphereGeo, textGeo;
+	var pointMeshes = [];
 	var projector;
 
 	var overRenderer;
@@ -181,77 +182,44 @@ DAT.Globe = function(container, opts) {
 		}, false);
 	}
 
-	addData = function(data, opts) {
+	addData = function(data) {
 		var lat, lng, color, i, step, colorFnWrapper;
-
-		opts.animated = opts.animated || false;
-		this.is_animated = opts.animated;
 
 		step = 4;
 		colorFnWrapper = function(data, i) { return colorFn(data[i + 3]); }
 
-		if (opts.animated) {
-			if (this._baseGeometry === undefined) {
-				this._baseGeometry = new THREE.Geometry();
-				for (i = 0; i < data.length; i += step) {
-					city = data[i];
-					lat = data[i + 1];
-					lng = data[i + 2];
-					color = colorFnWrapper(data,i);
-					addPoint(lat, lng, city, color, this._baseGeometry, false);
-				}
-			}
+		this._baseGeometry = new THREE.Geometry();
+		
+		for (i = 0; i < data.length; i += step) {
+			var pointGeo = new THREE.Geometry();
+			
+			city = data[i];
+			lat = data[i + 1];
+			lng = data[i + 2];
+			color = colorFnWrapper(data, i);
+			
+			addPoint(lat, lng, city, color, 1.5, pointGeo, true);
+			
 			if (this._morphTargetId === undefined) {
 				this._morphTargetId = 0;
 			} else {
 				this._morphTargetId += 1;
 			}
-			opts.name = opts.name || 'morphTarget'+this._morphTargetId;
-		}
-		var subgeo = new THREE.Geometry();
-
-		for (i = 0; i < data.length; i += step) {
-			city = data[i];
-			lat = data[i + 1];
-			lng = data[i + 2];
-			color = colorFnWrapper(data,i);
-			addPoint(lat, lng, city, color, subgeo, true);
-		}
-		if (opts.animated) {
-			this._baseGeometry.morphTargets.push({'name': opts.name, vertices: subgeo.vertices});
-		} else {
-			this._baseGeometry = subgeo;
-		}
-
-	};
-
-	function createPoints() {
-		if (this._baseGeometry !== undefined) {
-			if (this.is_animated === false) {
-				this.points = new THREE.Mesh(this._baseGeometry, new THREE.MeshBasicMaterial({
-					color: 0xffffff,
-					vertexColors: THREE.FaceColors,
-					morphTargets: false
-				}));
-			} else {
-				if (this._baseGeometry.morphTargets.length < 8) {
-					console.log('t l',this._baseGeometry.morphTargets.length);
-					var padding = 8-this._baseGeometry.morphTargets.length;
-					console.log('padding', padding);
-					for(var i=0; i<=padding; i++) {
-						console.log('padding',i);
-						this._baseGeometry.morphTargets.push({'name': 'morphPadding'+i, vertices: this._baseGeometry.vertices});
-					}
-				}
-				this.points = new THREE.Mesh(this._baseGeometry, new THREE.MeshBasicMaterial({
+			morphName = 'morphTarget' + this._morphTargetId;
+			
+			var subgeo = new THREE.Geometry();
+			addPoint(lat, lng, city, color, 3, subgeo, false);
+			pointGeo.morphTargets.push({'name': morphName, vertices: subgeo.vertices});
+			
+			var pointMesh = new THREE.Mesh(pointGeo, new THREE.MeshBasicMaterial({
 					color: 0xffffff,
 					vertexColors: THREE.FaceColors,
 					morphTargets: true
 				}));
-			}
-			scene.add(this.points);
+			pointMeshes.push(pointMesh);
+			scene.add(pointMesh);
 		}
-	}
+	};
 
 	function drawText(textString, color, phi, theta) {
 
@@ -283,7 +251,7 @@ DAT.Globe = function(container, opts) {
 		scene.add(textGeo);
 	}
 
-	function addPoint(lat, lng, city, color, subgeo, record) {
+	function addPoint(lat, lng, city, color, scale, subgeo, record) {
 
 		var phi = (90 - lat) * Math.PI / 180;
 		var theta = (180 - lng) * Math.PI / 180;
@@ -294,12 +262,10 @@ DAT.Globe = function(container, opts) {
 
 		point.lookAt(mesh.position);
 
-		point.scale.x = 2;
-		point.scale.y = 2;
+		point.scale.x = scale;
+		point.scale.y = scale;
 		point.scale.z = 0.1;
 		point.updateMatrix();
-
-		// drawText(city, color, phi, theta);
 
 		if (record) {
 			cities.push({'position': point.position.clone(), 'name': city, 'phi': phi, 'theta': theta, 'color': color});
@@ -368,6 +334,25 @@ DAT.Globe = function(container, opts) {
 		mouseDownOn = true;
 	}
 
+	function clearActiveCity() {
+		if (textGeo !== null) {
+			scene.remove(textGeo);
+			textGeo = null;
+		}
+		if (activeCity !== -1) {
+			pointMeshes[activeCity].morphTargetInfluences[0] = 0;
+		}
+		activeCity = -1;
+	}
+
+	function setActiveCity(newCity) {
+		activeCity = newCity;
+		if (newCity !== -1) {
+			drawText(cities[newCity].name, cities[newCity].color, cities[newCity].phi, cities[newCity].theta);
+			pointMeshes[newCity].morphTargetInfluences[0] = 1;
+		}
+	}
+
 	function onMouseMove(event) {
 		if (mouseDownOn === true) {
 			mouse.x = - event.clientX;
@@ -381,11 +366,7 @@ DAT.Globe = function(container, opts) {
 			target.y = target.y > PI_HALF ? PI_HALF : target.y;
 			target.y = target.y < - PI_HALF ? - PI_HALF : target.y;
 
-			if (textGeo !== null) {
-				scene.remove(textGeo);
-				textGeo = null;
-			}
-			activeCity = -1;
+			clearActiveCity();
 		} else {
 			clearTimeout(timer);
 			timer = setTimeout(function() {
@@ -393,14 +374,8 @@ DAT.Globe = function(container, opts) {
 				if (intersectPoint !== null) {
 					var city = findClosestCity(intersectPoint);
 					if (city !== activeCity) {
-						if (textGeo !== null) {
-							scene.remove(textGeo);
-							textGeo = null;	
-						}
-						activeCity = city;
-						if (city !== -1) {
-							drawText(cities[city].name, cities[city].color, cities[city].phi, cities[city].theta);
-						}
+						clearActiveCity();
+						setActiveCity(city);
 					}
 				}
 			}, 200);
@@ -485,38 +460,7 @@ DAT.Globe = function(container, opts) {
 
 	init();
 	this.animate = animate;
-
-
-	this.__defineGetter__('time', function() {
-		return this._time || 0;
-	});
-
-	this.__defineSetter__('time', function(t) {
-		var validMorphs = [];
-		var morphDict = this.points.morphTargetDictionary;
-		for(var k in morphDict) {
-			if(k.indexOf('morphPadding') < 0) {
-				validMorphs.push(morphDict[k]);
-			}
-		}
-		validMorphs.sort();
-		var l = validMorphs.length-1;
-		var scaledt = t*l+1;
-		var index = Math.floor(scaledt);
-		for (i=0;i<validMorphs.length;i++) {
-			this.points.morphTargetInfluences[validMorphs[i]] = 0;
-		}
-		var lastIndex = index - 1;
-		var leftover = scaledt - index;
-		if (lastIndex >= 0) {
-			this.points.morphTargetInfluences[lastIndex] = 1 - leftover;
-		}
-		this.points.morphTargetInfluences[index] = leftover;
-		this._time = t;
-	});
-
 	this.addData = addData;
-	this.createPoints = createPoints;
 	this.renderer = renderer;
 	this.scene = scene;
 
