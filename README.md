@@ -1,69 +1,30 @@
-The **WebGL Globe** is an open platform for geographic data visualization created by the Google Data Arts Team. We encourage you to copy the code, add your own data, and create your own globes.
+# Follow My Feet
 
-Check out the examples at http://www.chromeexperiments.com/globe, and if you create a globe, please [share it with us](http://www.chromeexperiments.com/globe-submit). We post our favorite globes publicly.
+**Follow My Feet** is a project showing your steps around the world. This project is based on **WebGL Globe** created by Google Data Arts Team (https://github.com/dataarts/webgl-globe)
 
-![](http://4.bp.blogspot.com/-nB6XnTgb4AA/TcLQ4gRBtfI/AAAAAAAAH-U/vb2GuhPN6aM/globe.png)
-
-----
-
-**The WebGL Globe** supports data in `JSON` format, a sample of which you can find [here](http://code.google.com/p/webgl-globe/source/browse/globe/population909500.json). `webgl-globe` makes heavy use of the [Three.js library](https://github.com/mrdoob/three.js/).
+**Follow My Feet** supports data in `JSON` format. `globe.js` makes heavy use of the `Three.js` library (https://github.com/mrdoob/three.js).
 
 # Data Format
 
-The following illustrates the `JSON` data format that the globe expects:
+The following illustrates the `JSON` data format that we except:
 
-```javascript
-var data = [
-    [
-    'seriesA', [ latitude, longitude, magnitude, latitude, longitude, magnitude, ... ]
-    ],
-    [
-    'seriesB', [ latitude, longitude, magnitude, latitude, longitude, magnitude, ... ]
-    ]
-];
-```
+	var data = [
+		["*",
+			[
+				cityName, latitude, longitude, star, 121.5, 
+				...
+			]
+		]
+	]
 
-# Basic Usage
+here, the `"*"` is reversed for historical reasons.
 
-The following code polls a `JSON` file (formatted like the one above) for geo-data and adds it to an animated, interactive WebGL globe.
+# Example
 
-```javascript
-// Where to put the globe?
-var container = document.getElementById( 'container' );
+**Follow My Feet** can easily be ported to your blog, here is an example, see http://foreverbell.0ginr.com/feet/ .
 
-// Make the globe
-var globe = new DAT.Globe( container );
+# Local Test
 
-// We're going to ask a file for the JSON data.
-var xhr = new XMLHttpRequest();
+We recommend you use `python` to set up a simple http server. 
 
-// Where do we get the data?
-xhr.open( 'GET', 'myjson.json', true );
-
-// What do we do when we have it?
-xhr.onreadystatechange = function() {
-
-    // If we've received the data
-    if ( xhr.readyState === 4 && xhr.status === 200 ) {
-
-        // Parse the JSON
-        var data = JSON.parse( xhr.responseText );
-
-        // Tell the globe about your JSON data
-        for ( var i = 0; i < data.length; i ++ ) {
-            globe.addData( data[i][1], 'magnitude', data[i][0] );
-        }
-
-        // Create the geometry
-        globe.createPoints();
-
-        // Begin animation
-        globe.animate();
-
-    }
-
-};
-
-// Begin request
-xhr.send( null );
-```
+Run command `python -m SimpleHTTPServer`, then go to `http://127.0.0.1:8000/feet/` to see what happens :)
