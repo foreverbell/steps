@@ -9,15 +9,9 @@
 The following illustrates the `JSON` data format that we except:
 
 	var data = [
-		["*",
-			[
-				cityName, latitude, longitude, star, 
-				...
-			]
-		]
+		cityName, latitude, longitude, starRate, 
+		...
 	]
-
-here, the `"*"` is reserved for historical reasons.
 
 # Example
 

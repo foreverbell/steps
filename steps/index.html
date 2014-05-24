@@ -126,7 +126,7 @@
       Detector.addGetWebGLMessage();
     } else {
 
-      var tags = ['*'];
+      // var tags = ['*'];
       var container = document.getElementById('container');
       var globe = new DAT.Globe(container);
 
@@ -144,7 +144,6 @@
       var xhr;
       TWEEN.start();
       
-      
       xhr = new XMLHttpRequest();
       xhr.open('GET', '/steps/city.json', true);
       xhr.onreadystatechange = function(e) {
@@ -152,9 +151,7 @@
           if (xhr.status === 200) {
             var data = JSON.parse(xhr.responseText);
             window.data = data;
-            for (i=0;i<data.length;i++) {
-				globe.addData(data[i][1], {name: data[i][0], animated: true});
-            }
+			globe.addData(data);
             globe.animate();
             document.body.style.backgroundImage = 'none'; // remove loading
           }

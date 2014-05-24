@@ -187,8 +187,6 @@ DAT.Globe = function(container, opts) {
 
 		step = 4;
 		colorFnWrapper = function(data, i) { return colorFn(data[i + 3]); }
-
-		this._baseGeometry = new THREE.Geometry();
 		
 		for (i = 0; i < data.length; i += step) {
 			var pointGeo = new THREE.Geometry();
