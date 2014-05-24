@@ -344,7 +344,7 @@ DAT.Globe = function(container, opts) {
 			} 
 		}
 
-		if (index === -1 || best < 0.9999) {
+		if (index === -1 || best < 0.999) {
 			return -1;
 		}
 		return index;
