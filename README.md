@@ -23,6 +23,10 @@ here, the `"*"` is reversed for historical reasons.
 
 **Follow My Feet** can easily be ported to your blog, here is an example, see http://foreverbell.0ginr.com/feet/ .
 
+# Usage
+
+Coming soon.
+
 # Local Test
 
 We recommend you use `python` to set up a simple http server. 
