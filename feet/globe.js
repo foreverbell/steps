@@ -70,6 +70,8 @@ DAT.Globe = function(container, opts) {
 
 	var camera, scene, renderer, w, h;
 	var mesh, atmosphere, point;
+	var sphereGeo, textGeo;
+	var projector;
 
 	var overRenderer;
 
@@ -85,10 +87,7 @@ DAT.Globe = function(container, opts) {
 	var padding = 40;
 	var PI_HALF = Math.PI / 2;
 
-	var sphereGeo, fontGeo;
-	var cities = [];
-
-	var projector;
+	var cities = [], activeCity = -1;
 
 	var mouseDownOn = false;
 	var lastTimeMouseMoved = 0;
@@ -250,34 +249,32 @@ DAT.Globe = function(container, opts) {
 
 	function drawText(textString, color, phi, theta) {
 
-		var text3d = new THREE.TextGeometry(textString, 
-											{
-												size: 2,
-												height: 0.1, // thickness of the text
-												curveSegments: 2,
-												font: 'helvetiker'
-											});
+		var text3d = new THREE.TextGeometry(textString, {
+			size: 3,
+			height: 0.1, // thickness of the text
+			curveSegments: 2,
+			font: 'helvetiker'
+		});
 
-											var textMaterial = new THREE.MeshBasicMaterial(
-												{ 
-												color: color,
-												overdraw: true 
-											});
+		var textMaterial = new THREE.MeshBasicMaterial({ 
+			color: color,
+			overdraw: true 
+		});
 
-											textGeo = new THREE.Mesh(text3d, textMaterial);
+		textGeo = new THREE.Mesh(text3d, textMaterial);
 
-											theta -= Math.PI / 360;
-											textGeo.position.x = 200 * Math.sin(phi) * Math.cos(theta);
-											textGeo.position.y = 200 * Math.cos(phi);
-											textGeo.position.z = 200 * Math.sin(phi) * Math.sin(theta);
+		theta -= Math.PI / 360;
+		textGeo.position.x = 200 * Math.sin(phi) * Math.cos(theta);
+		textGeo.position.y = 200 * Math.cos(phi);
+		textGeo.position.z = 200 * Math.sin(phi) * Math.sin(theta);
 
-											textGeo.position.multiplyScalar(1.001);
+		textGeo.position.multiplyScalar(1.001);
 
-											var lookat = textGeo.position.clone();
-											lookat = lookat.multiplyScalar(2);
-											textGeo.lookAt(lookat);
+		var lookat = textGeo.position.clone();
+		lookat = lookat.multiplyScalar(2);
+		textGeo.lookAt(lookat);
 
-											scene.add(textGeo);
+		scene.add(textGeo);
 	}
 
 	function addPoint(lat, lng, city, color, subgeo, record) {
@@ -291,13 +288,15 @@ DAT.Globe = function(container, opts) {
 
 		point.lookAt(mesh.position);
 
+		point.scale.x = 2;
+		point.scale.y = 2;
 		point.scale.z = 0.1;
 		point.updateMatrix();
 
-		drawText(city, color, phi, theta);
+		// drawText(city, color, phi, theta);
 
 		if (record) {
-			cities.push({'position': point.position.clone(), 'name': city});
+			cities.push({'position': point.position.clone(), 'name': city, 'phi': phi, 'theta': theta, 'color': color});
 		}
 
 		for (var i = 0; i < point.geometry.faces.length; i++) {
@@ -334,19 +333,17 @@ DAT.Globe = function(container, opts) {
 		for (i = 0; i < cities.length; i += 1) {
 			city = cities[i].position.clone();
 			city.sub(mesh.position).normalize();
-
 			dist = city.dot(point);
-
 			if (index === -1 || dist > best) {
 				index = i;
 				best = dist;
 			} 
 		}
 
-		if (index === -1 || dist < 0.9999) {
-			return null;
+		if (index === -1 || best < 0.9999) {
+			return -1;
 		}
-		return cities[index].name;
+		return index;
 	}
 
 	function onMouseDown(event) {
@@ -384,13 +381,23 @@ DAT.Globe = function(container, opts) {
 			lastTimeMouseMoved = new Date().getTime();
 			var timer = setTimeout(function() {
 				var currentTime = new Date().getTime();
-				if (currentTime - lastTimeMouseMoved > 400) {
+				if (currentTime - lastTimeMouseMoved > 300) {
 					var intersectPoint = objectPick(event);
 					if (intersectPoint !== null) {
-						findClosestCity(intersectPoint);
+						var city = findClosestCity(intersectPoint);
+						if (city !== activeCity) {
+							if (textGeo !== null) {
+								scene.remove(textGeo);
+							}
+							textGeo = null;
+							activeCity = city;
+							if (city !== -1) {
+								drawText(cities[city].name, cities[city].color, cities[city].phi, cities[city].theta);
+							}
+						}
 					}
 				}
-			}, 410);
+			}, 310);
 
 		}	
 	}
@@ -424,12 +431,12 @@ DAT.Globe = function(container, opts) {
 		switch (event.keyCode) {
 			case 38:
 				zoom(100);
-			event.preventDefault();
-			break;
+				event.preventDefault();
+				break;
 			case 40:
 				zoom(-100);
-			event.preventDefault();
-			break;
+				event.preventDefault();
+				break;
 		}
 	}
 
