@@ -17,7 +17,7 @@ The following illustrates the `JSON` data format that we except:
 		]
 	]
 
-here, the `"*"` is reversed for historical reasons.
+here, the `"*"` is reserved for historical reasons.
 
 # Example
 
