@@ -11,7 +11,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Modified by foreverbell<dql.foreverbell@gmail.com> to use it in
- * the project follow-my-feet.
+ * the project follow-my-steps.
 */
 
 var DAT = DAT || {};
@@ -24,7 +24,7 @@ DAT.Globe = function(container, opts) {
 		c.setHSL( ( 0.6 - ( x * 0.5 ) ), 1.0, 0.5 );
 		return c;
 	};
-	var imgDir = opts.imgDir || '/feet/';
+	var imgDir = opts.imgDir || '/steps/';
 
 	var Shaders = {
 		'earth' : {
@@ -269,7 +269,7 @@ DAT.Globe = function(container, opts) {
 
 		textGeo = new THREE.Mesh(text3d, textMaterial);
 
-		theta -= Math.PI / 360;
+		theta -= Math.PI / 180;
 		textGeo.position.x = 200 * Math.sin(phi) * Math.cos(theta);
 		textGeo.position.y = 200 * Math.cos(phi);
 		textGeo.position.z = 200 * Math.sin(phi) * Math.sin(theta);
