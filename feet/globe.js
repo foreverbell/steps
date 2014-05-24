@@ -9,6 +9,9 @@
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Modified by foreverbell<dql.foreverbell@gmail.com> to use it in
+ * the project follow-my-feet.
 */
 
 var DAT = DAT || {};
@@ -90,7 +93,7 @@ DAT.Globe = function(container, opts) {
 	var cities = [], activeCity = -1;
 
 	var mouseDownOn = false;
-	var lastTimeMouseMoved = 0;
+	var timer;
 
 	function init() {
 
@@ -103,6 +106,9 @@ DAT.Globe = function(container, opts) {
 
 		camera = new THREE.PerspectiveCamera(30, w / h, 1, 10000);
 		camera.position.z = distance;
+		
+		// make China faced to user
+		target.x = 0.5;
 
 		projector = new THREE.Projector();
 		scene = new THREE.Scene();
@@ -300,9 +306,7 @@ DAT.Globe = function(container, opts) {
 		}
 
 		for (var i = 0; i < point.geometry.faces.length; i++) {
-
 			point.geometry.faces[i].color = color;
-
 		}
 
 		THREE.GeometryUtils.merge(subgeo, point);
@@ -377,27 +381,29 @@ DAT.Globe = function(container, opts) {
 			target.y = target.y > PI_HALF ? PI_HALF : target.y;
 			target.y = target.y < - PI_HALF ? - PI_HALF : target.y;
 
+			if (textGeo !== null) {
+				scene.remove(textGeo);
+				textGeo = null;
+			}
+			activeCity = -1;
 		} else {
-			lastTimeMouseMoved = new Date().getTime();
-			var timer = setTimeout(function() {
-				var currentTime = new Date().getTime();
-				if (currentTime - lastTimeMouseMoved > 300) {
-					var intersectPoint = objectPick(event);
-					if (intersectPoint !== null) {
-						var city = findClosestCity(intersectPoint);
-						if (city !== activeCity) {
-							if (textGeo !== null) {
-								scene.remove(textGeo);
-							}
-							textGeo = null;
-							activeCity = city;
-							if (city !== -1) {
-								drawText(cities[city].name, cities[city].color, cities[city].phi, cities[city].theta);
-							}
+			clearTimeout(timer);
+			timer = setTimeout(function() {
+				var intersectPoint = objectPick(event);
+				if (intersectPoint !== null) {
+					var city = findClosestCity(intersectPoint);
+					if (city !== activeCity) {
+						if (textGeo !== null) {
+							scene.remove(textGeo);
+							textGeo = null;	
+						}
+						activeCity = city;
+						if (city !== -1) {
+							drawText(cities[city].name, cities[city].color, cities[city].phi, cities[city].theta);
 						}
 					}
 				}
-			}, 310);
+			}, 200);
 
 		}	
 	}
@@ -408,6 +414,10 @@ DAT.Globe = function(container, opts) {
 		container.removeEventListener('mouseout', onMouseOut, false);
 		container.style.cursor = 'auto';
 
+		if (activeCity != -1) {
+			var dir = imgDir + 'journey/' + cities[activeCity].name + '.html';
+			window.open(dir, '_blank');
+		}
 		mouseDownOn = false;
 	}
 
