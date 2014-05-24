@@ -19,7 +19,6 @@
       }
 
       #info {
-
         font-size: 11px;
         position: absolute;
         bottom: 5px;
@@ -27,7 +26,6 @@
         border-radius: 3px;
         right: 10px;
         padding: 10px;
-
       }
 
       #currentInfo {
@@ -128,7 +126,7 @@
       Detector.addGetWebGLMessage();
     } else {
 
-      var fake = ['*'];
+      var tags = ['*'];
       var container = document.getElementById('container');
       var globe = new DAT.Globe(container);
 
@@ -137,7 +135,7 @@
       
       var settime = function(globe, t) {
         return function() {
-          new TWEEN.Tween(globe).to({time: t/fake.length},500).easing(TWEEN.Easing.Cubic.EaseOut).start();
+          new TWEEN.Tween(globe).to({time: t/tags.length},500).easing(TWEEN.Easing.Cubic.EaseOut).start();
         };
       };
      
@@ -146,17 +144,17 @@
       
       
       xhr = new XMLHttpRequest();
-      xhr.open('GET', '/steps/place.json', true);
+      xhr.open('GET', '/steps/city.json', true);
       xhr.onreadystatechange = function(e) {
         if (xhr.readyState === 4) {
           if (xhr.status === 200) {
             var data = JSON.parse(xhr.responseText);
             window.data = data;
             for (i=0;i<data.length;i++) {
-              globe.addData(data[i][1], {name: data[i][0], animated: true});
+				globe.addData(data[i][1], {name: data[i][0], animated: true});
             }
             globe.createPoints();
-            settime(globe,0)();
+            settime(globe, 0)();
             globe.animate();
             document.body.style.backgroundImage = 'none'; // remove loading
           }

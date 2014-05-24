@@ -201,7 +201,7 @@ DAT.Globe = function(container, opts) {
 					addPoint(lat, lng, city, color, this._baseGeometry, false);
 				}
 			}
-			if(this._morphTargetId === undefined) {
+			if (this._morphTargetId === undefined) {
 				this._morphTargetId = 0;
 			} else {
 				this._morphTargetId += 1;
@@ -256,7 +256,7 @@ DAT.Globe = function(container, opts) {
 	function drawText(textString, color, phi, theta) {
 
 		var text3d = new THREE.TextGeometry(textString, {
-			size: 3,
+			size: 5,
 			height: 0.1, // thickness of the text
 			curveSegments: 2,
 			font: 'helvetiker'
