@@ -391,6 +391,12 @@ DAT.Globe = function(container, opts) {
 
 		if (activeCity != -1) {
 			var dir = imgDir + 'journey/' + cities[activeCity].name.toLowerCase() + '.html';
+			var xhr = new XMLHttpRequest();
+			xhr.open('HEAD', dir, false);
+			xhr.send(null);
+			if (xhr.status === 404) {
+				dir = 'http://en.wikipedia.org/wiki/' + cities[activeCity].name;
+			}
 			window.open(dir, '_blank');
 		}
 		mouseDownOn = false;
