@@ -415,7 +415,7 @@ DAT.Globe = function(container, opts) {
 		container.style.cursor = 'auto';
 
 		if (activeCity != -1) {
-			var dir = imgDir + 'journey/' + cities[activeCity].name + '.html';
+			var dir = imgDir + 'journey/' + cities[activeCity].name.toLowerCase() + '.html';
 			window.open(dir, '_blank');
 		}
 		mouseDownOn = false;
