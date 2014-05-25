@@ -184,9 +184,9 @@ DAT.Globe = function(container, opts) {
 	}
 
 	addData = function(data) {
-		var lat, lng, color, i, step, colorFnWrapper;
+		var lat, lng, color, uri, i, step, colorFnWrapper;
 
-		step = 4;
+		step = 5;
 		colorFnWrapper = function(data, i) { return colorFn(data[i + 3]); }
 		
 		for (i = 0; i < data.length; i += step) {
@@ -196,8 +196,9 @@ DAT.Globe = function(container, opts) {
 			lat = data[i + 1];
 			lng = data[i + 2];
 			color = colorFnWrapper(data, i);
-			
-			addPoint(lat, lng, city, color, 1.5, 0, subgeo, true);
+			uri = data[i + 4];
+
+			addCity(lat, lng, city, color, 1.5, 0, uri, subgeo, true);
 			
 			if (this._morphTargetId === undefined) {
 				this._morphTargetId = 0;
@@ -207,7 +208,7 @@ DAT.Globe = function(container, opts) {
 			morphName = 'morphTarget' + this._morphTargetId;
 			
 			var subgeoScaled = new THREE.Geometry();
-			addPoint(lat, lng, city, color, 4, 1, subgeoScaled, false);
+			addCity(lat, lng, city, color, 4, 1, uri, subgeoScaled, false);
 			subgeo.morphTargets.push({'name': morphName, vertices: subgeoScaled.vertices});
 			
 			var pointMesh = new THREE.Mesh(subgeo, new THREE.MeshBasicMaterial({
@@ -220,7 +221,7 @@ DAT.Globe = function(container, opts) {
 		}
 	};
 
-	function addPoint(lat, lng, city, color, scale, scaleText, subgeo, record) {
+	function addCity(lat, lng, city, color, scale, scaleText, uri, subgeo, record) {
 
 		// point
 		var phi = (90 - lat) * Math.PI / 180;
@@ -244,7 +245,7 @@ DAT.Globe = function(container, opts) {
 		THREE.GeometryUtils.merge(subgeo, point);
 	
 		if (record) {
-			cities.push({'position': point.position.clone(), 'name': city, 'phi': phi, 'theta': theta, 'color': color});
+			cities.push({'position': point.position.clone(), 'name': city, 'uri': uri});
 		}
 
 		// text
@@ -257,9 +258,9 @@ DAT.Globe = function(container, opts) {
 
 		text = new THREE.Mesh(text3d);
 
-		text.position.x = 200 * Math.sin(phi) * Math.cos(theta - Math.PI / 180);
+		text.position.x = 200 * Math.sin(phi) * Math.cos(theta - Math.PI / 120);
 		text.position.y = 200 * Math.cos(phi);
-		text.position.z = 200 * Math.sin(phi) * Math.sin(theta - Math.PI / 180);
+		text.position.z = 200 * Math.sin(phi) * Math.sin(theta - Math.PI / 120);
 
 		text.position.multiplyScalar(1.001);
 
@@ -398,14 +399,7 @@ DAT.Globe = function(container, opts) {
 		container.style.cursor = 'auto';
 
 		if (activeCity != -1) {
-			var dir = imgDir + 'journey/' + cities[activeCity].name.toLowerCase() + '.html';
-			var xhr = new XMLHttpRequest();
-			xhr.open('HEAD', dir, false);
-			xhr.send(null);
-			if (xhr.status === 404) {
-				dir = 'http://en.wikipedia.org/wiki/' + cities[activeCity].name;
-			}
-			window.open(dir, '_blank');
+			window.open(cities[activeCity].uri);
 		}
 		mouseDownOn = false;
 	}

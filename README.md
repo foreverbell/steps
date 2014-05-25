@@ -4,22 +4,20 @@
 
 **Follow My Steps** supports data in `JSON` format. `globe.js` makes heavy use of the `Three.js` library (https://github.com/mrdoob/three.js).
 
+![](https://github.com/foreverbell/follow-my-steps/steps.png)
+
 # Data Format
 
 The following illustrates the `JSON` data format that we except:
 
 	var data = [
-		cityName, latitude, longitude, starRate, 
+		cityName, latitude, longitude, starRate, linkURI,
 		...
 	]
 
 # Example
 
 **Follow My Steps** can easily be ported to your blog, here is an example, see http://foreverbell.0ginr.com/steps/ .
-
-# Usage
-
-Coming soon.
 
 # Local Test
 
