@@ -235,7 +235,7 @@ DAT.Globe = function(container, opts) {
 
 		point.scale.x = scale;
 		point.scale.y = scale;
-		point.scale.z = 0.1;
+		point.scale.z = 0.5;
 		point.updateMatrix();
 
 		for (var i = 0; i < point.geometry.faces.length; i++) {
@@ -251,7 +251,7 @@ DAT.Globe = function(container, opts) {
 		// text
 		var text3d = new THREE.TextGeometry(city, {
 			size: 5,
-			height: 0.1, // thickness of the text
+			height: 0.5, // thickness of the text
 			curveSegments: 2,
 			font: 'helvetiker',
 		});
@@ -268,9 +268,7 @@ DAT.Globe = function(container, opts) {
 		text.scale.y = scaleText;
 		text.updateMatrix();
 
-		var lookat = text.position.clone();
-		lookat = lookat.multiplyScalar(2);
-		text.lookAt(lookat);
+		text.lookAt(text.position.clone().multiplyScalar(2));
 		
 		for (var i = 0; i < text.geometry.faces.length; i++) {
 			text.geometry.faces[i].color = color;
@@ -311,7 +309,7 @@ DAT.Globe = function(container, opts) {
 			} 
 		}
 
-		if (index === -1 || best < 0.999) {
+		if (index === -1 || best < 0.9998) {
 			return -1;
 		}
 		return index;
