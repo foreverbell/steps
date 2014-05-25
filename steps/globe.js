@@ -72,8 +72,8 @@ DAT.Globe = function(container, opts) {
 	};
 
 	var camera, scene, renderer, w, h;
-	var mesh, atmosphere, point;
-	var sphereGeo, textGeo;
+	var mesh, atmosphere, point, text;
+	var sphere;
 	var pointMeshes = [];
 	var projector;
 
@@ -119,7 +119,7 @@ DAT.Globe = function(container, opts) {
 		shader = Shaders['earth'];
 		uniforms = THREE.UniformsUtils.clone(shader.uniforms);
 
-		uniforms['texture'].value = THREE.ImageUtils.loadTexture(imgDir+'world.jpg');
+		uniforms['texture'].value = THREE.ImageUtils.loadTexture(imgDir + 'world.jpg');
 
 		material = new THREE.ShaderMaterial({
 
@@ -129,9 +129,9 @@ DAT.Globe = function(container, opts) {
 
 		});
 
-		sphereGeo = new THREE.Mesh(geometry, material);
-		sphereGeo.rotation.y = Math.PI;
-		scene.add(sphereGeo);
+		sphere = new THREE.Mesh(geometry, material);
+		sphere.rotation.y = Math.PI;
+		scene.add(sphere);
 
 		shader = Shaders['atmosphere'];
 		uniforms = THREE.UniformsUtils.clone(shader.uniforms);
@@ -179,6 +179,7 @@ DAT.Globe = function(container, opts) {
 
 		container.addEventListener('mouseout', function() {
 			overRenderer = false;
+			clearActiveCity();
 		}, false);
 	}
 
@@ -189,14 +190,14 @@ DAT.Globe = function(container, opts) {
 		colorFnWrapper = function(data, i) { return colorFn(data[i + 3]); }
 		
 		for (i = 0; i < data.length; i += step) {
-			var pointGeo = new THREE.Geometry();
+			var subgeo = new THREE.Geometry();
 			
 			city = data[i];
 			lat = data[i + 1];
 			lng = data[i + 2];
 			color = colorFnWrapper(data, i);
 			
-			addPoint(lat, lng, city, color, 1.5, pointGeo, true);
+			addPoint(lat, lng, city, color, 1.5, 0, subgeo, true);
 			
 			if (this._morphTargetId === undefined) {
 				this._morphTargetId = 0;
@@ -205,11 +206,11 @@ DAT.Globe = function(container, opts) {
 			}
 			morphName = 'morphTarget' + this._morphTargetId;
 			
-			var subgeo = new THREE.Geometry();
-			addPoint(lat, lng, city, color, 4, subgeo, false);
-			pointGeo.morphTargets.push({'name': morphName, vertices: subgeo.vertices});
+			var subgeoScaled = new THREE.Geometry();
+			addPoint(lat, lng, city, color, 4, 1, subgeoScaled, false);
+			subgeo.morphTargets.push({'name': morphName, vertices: subgeoScaled.vertices});
 			
-			var pointMesh = new THREE.Mesh(pointGeo, new THREE.MeshBasicMaterial({
+			var pointMesh = new THREE.Mesh(subgeo, new THREE.MeshBasicMaterial({
 					color: 0xffffff,
 					vertexColors: THREE.FaceColors,
 					morphTargets: true
@@ -219,38 +220,9 @@ DAT.Globe = function(container, opts) {
 		}
 	};
 
-	function drawText(textString, color, phi, theta) {
+	function addPoint(lat, lng, city, color, scale, scaleText, subgeo, record) {
 
-		var text3d = new THREE.TextGeometry(textString, {
-			size: 5,
-			height: 0.1, // thickness of the text
-			curveSegments: 2,
-			font: 'helvetiker'
-		});
-
-		var textMaterial = new THREE.MeshBasicMaterial({ 
-			color: color,
-			overdraw: true 
-		});
-
-		textGeo = new THREE.Mesh(text3d, textMaterial);
-
-		theta -= Math.PI / 180;
-		textGeo.position.x = 200 * Math.sin(phi) * Math.cos(theta);
-		textGeo.position.y = 200 * Math.cos(phi);
-		textGeo.position.z = 200 * Math.sin(phi) * Math.sin(theta);
-
-		textGeo.position.multiplyScalar(1.001);
-
-		var lookat = textGeo.position.clone();
-		lookat = lookat.multiplyScalar(2);
-		textGeo.lookAt(lookat);
-
-		scene.add(textGeo);
-	}
-
-	function addPoint(lat, lng, city, color, scale, subgeo, record) {
-
+		// point
 		var phi = (90 - lat) * Math.PI / 180;
 		var theta = (180 - lng) * Math.PI / 180;
 
@@ -265,15 +237,45 @@ DAT.Globe = function(container, opts) {
 		point.scale.z = 0.1;
 		point.updateMatrix();
 
-		if (record) {
-			cities.push({'position': point.position.clone(), 'name': city, 'phi': phi, 'theta': theta, 'color': color});
-		}
-
 		for (var i = 0; i < point.geometry.faces.length; i++) {
 			point.geometry.faces[i].color = color;
 		}
 
 		THREE.GeometryUtils.merge(subgeo, point);
+	
+		if (record) {
+			cities.push({'position': point.position.clone(), 'name': city, 'phi': phi, 'theta': theta, 'color': color});
+		}
+
+		// text
+		var text3d = new THREE.TextGeometry(city, {
+			size: 5,
+			height: 0.1, // thickness of the text
+			curveSegments: 2,
+			font: 'helvetiker',
+		});
+
+		text = new THREE.Mesh(text3d);
+
+		text.position.x = 200 * Math.sin(phi) * Math.cos(theta - Math.PI / 180);
+		text.position.y = 200 * Math.cos(phi);
+		text.position.z = 200 * Math.sin(phi) * Math.sin(theta - Math.PI / 180);
+
+		text.position.multiplyScalar(1.001);
+
+		text.scale.x = scaleText;
+		text.scale.y = scaleText;
+		text.updateMatrix();
+
+		var lookat = text.position.clone();
+		lookat = lookat.multiplyScalar(2);
+		text.lookAt(lookat);
+		
+		for (var i = 0; i < text.geometry.faces.length; i++) {
+			text.geometry.faces[i].color = color;
+		}
+
+		THREE.GeometryUtils.merge(subgeo, text);
 	}
 
 	function objectPick(event) {
@@ -283,7 +285,7 @@ DAT.Globe = function(container, opts) {
 
 		var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
 
-		var intersects = raycaster.intersectObject(sphereGeo);
+		var intersects = raycaster.intersectObject(sphere);
 
 		if (intersects.length > 0) {
 			return intersects[0].point;
@@ -333,10 +335,6 @@ DAT.Globe = function(container, opts) {
 	}
 
 	function clearActiveCity() {
-		if (textGeo !== null) {
-			scene.remove(textGeo);
-			textGeo = null;
-		}
 		if (activeCity !== -1) {
 			var saved = activeCity;
 			var tween = new TWEEN.Tween({var: pointMeshes[activeCity].morphTargetInfluences[0]})
@@ -353,7 +351,7 @@ DAT.Globe = function(container, opts) {
 	function setActiveCity(newCity) {
 		activeCity = newCity;
 		if (newCity !== -1) {
-			drawText(cities[newCity].name, cities[newCity].color, cities[newCity].phi, cities[newCity].theta);
+			// drawText(cities[newCity].name, cities[newCity].color, cities[newCity].phi, cities[newCity].theta);
 			var tween = new TWEEN.Tween({var: pointMeshes[activeCity].morphTargetInfluences[0]})
 				.to({var: 1}, 200)
 				.easing(TWEEN.Easing.Cubic.EaseIn)
