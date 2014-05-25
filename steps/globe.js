@@ -206,7 +206,7 @@ DAT.Globe = function(container, opts) {
 			morphName = 'morphTarget' + this._morphTargetId;
 			
 			var subgeo = new THREE.Geometry();
-			addPoint(lat, lng, city, color, 3, subgeo, false);
+			addPoint(lat, lng, city, color, 4, subgeo, false);
 			pointGeo.morphTargets.push({'name': morphName, vertices: subgeo.vertices});
 			
 			var pointMesh = new THREE.Mesh(pointGeo, new THREE.MeshBasicMaterial({
@@ -338,7 +338,14 @@ DAT.Globe = function(container, opts) {
 			textGeo = null;
 		}
 		if (activeCity !== -1) {
-			pointMeshes[activeCity].morphTargetInfluences[0] = 0;
+			var saved = activeCity;
+			var tween = new TWEEN.Tween({var: pointMeshes[activeCity].morphTargetInfluences[0]})
+				.to({var: 0}, 200)
+				.easing(TWEEN.Easing.Cubic.EaseOut)
+				.onUpdate( function() {
+					pointMeshes[saved].morphTargetInfluences[0] = this.var; 
+				})
+				.start();
 		}
 		activeCity = -1;
 	}
@@ -347,7 +354,13 @@ DAT.Globe = function(container, opts) {
 		activeCity = newCity;
 		if (newCity !== -1) {
 			drawText(cities[newCity].name, cities[newCity].color, cities[newCity].phi, cities[newCity].theta);
-			pointMeshes[newCity].morphTargetInfluences[0] = 1;
+			var tween = new TWEEN.Tween({var: pointMeshes[activeCity].morphTargetInfluences[0]})
+				.to({var: 1}, 200)
+				.easing(TWEEN.Easing.Cubic.EaseIn)
+				.onUpdate( function() {
+					pointMeshes[newCity].morphTargetInfluences[0] = this.var;
+				})
+				.start();
 		}
 	}
 
@@ -377,7 +390,6 @@ DAT.Globe = function(container, opts) {
 					}
 				}
 			}, 200);
-
 		}	
 	}
 

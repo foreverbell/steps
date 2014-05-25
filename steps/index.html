@@ -122,25 +122,16 @@
   <script type="text/javascript" src="/steps/globe.js"></script>
   <script type="text/javascript">
 
-    if(!Detector.webgl){
+    if(!Detector.webgl) {
       Detector.addGetWebGLMessage();
     } else {
 
-      // var tags = ['*'];
       var container = document.getElementById('container');
       var globe = new DAT.Globe(container);
 
       console.log(globe);
       var i, tweens = [];
       
-	  /*
-      var settime = function(globe, t) {
-        return function() {
-          new TWEEN.Tween(globe).to({time: t/tags.length},500).easing(TWEEN.Easing.Cubic.EaseOut).start();
-        };
-      };
-     */
-
       var xhr;
       TWEEN.start();
       
