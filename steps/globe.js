@@ -87,7 +87,7 @@ DAT.Globe = function(container, opts) {
 	target = { x: Math.PI*3/2, y: Math.PI / 6.0 },
 	targetOnDown = { x: 0, y: 0 };
 
-	var distance = 100000, distanceTarget = 100000;
+	var distance = 10000, distanceTarget = 10000;
 	var padding = 40;
 	var PI_HALF = Math.PI / 2;
 
@@ -106,7 +106,7 @@ DAT.Globe = function(container, opts) {
 		w = container.offsetWidth || window.innerWidth;
 		h = container.offsetHeight || window.innerHeight;
 
-		camera = new THREE.PerspectiveCamera(30, w / h, 1, 10000);
+		camera = new THREE.PerspectiveCamera(30, w / h, 1, 20000);
 		camera.position.z = distance;
 		
 		// make China faced to user
@@ -120,7 +120,7 @@ DAT.Globe = function(container, opts) {
 		shader = Shaders['earth'];
 		uniforms = THREE.UniformsUtils.clone(shader.uniforms);
 
-		uniforms['texture'].value = THREE.ImageUtils.loadTexture(imgDir + 'world.jpg');
+		uniforms['texture'].value = THREE.ImageUtils.loadTexture(imgDir + 'globe.jpg');
 
 		material = new THREE.ShaderMaterial({
 
@@ -157,6 +157,25 @@ DAT.Globe = function(container, opts) {
 
 		point = new THREE.Mesh(geometry);
 
+		// starfield-background {{{
+		var texture = THREE.ImageUtils.loadTexture(imgDir + 'starfield.jpg');
+		texture.wrapS = THREE.RepeatWrapping;
+		texture.wrapT = THREE.RepeatWrapping;
+		texture.repeat.set(4, 4);
+		material = new THREE.MeshBasicMaterial({
+			side: THREE.BackSide,
+			map: texture,
+			blending: THREE.AdditiveBlending,
+		});
+		var cubeMaterials = [];
+		for (var i = 0; i < 6; i++) {
+			cubeMaterials.push(material);
+		}
+
+		var starfieldMesh = new THREE.Mesh(new THREE.CubeGeometry(10001, 10001, 10001), new THREE.MeshFaceMaterial(cubeMaterials));
+		scene.add(starfieldMesh); 
+		// }}}
+		
 		renderer = new THREE.WebGLRenderer({antialias: true});
 		renderer.setSize(w, h);
 
