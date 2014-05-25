@@ -71,12 +71,12 @@ DAT.Globe = function(container, opts) {
 		}
 	};
 
-	var camera, scene, renderer, w, h;
+	var camera, scene, renderer;
 	var mesh, atmosphere, point, text;
 	var sphere;
 	var pointMeshes = [];
 	var projector;
-
+	
 	var overRenderer;
 
 	var curZoomSpeed = 0;
@@ -102,6 +102,7 @@ DAT.Globe = function(container, opts) {
 		container.style.font = '13px/20px Arial, sans-serif';
 
 		var shader, uniforms, material;
+		var w, h;
 		w = container.offsetWidth || window.innerWidth;
 		h = container.offsetHeight || window.innerHeight;
 
@@ -278,7 +279,7 @@ DAT.Globe = function(container, opts) {
 	}
 
 	function objectPick(event) {
-		var vector = new THREE.Vector3((event.clientX / w) * 2 - 1, - (event.clientY / h) * 2 + 1, 0.5);
+		var vector = new THREE.Vector3((event.clientX / window.innerWidth) * 2 - 1, - (event.clientY / window.innerHeight) * 2 + 1, 0.5);
 
 		projector.unprojectVector(vector, camera);
 
