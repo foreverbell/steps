@@ -1,140 +1,140 @@
 <!DOCTYPE HTML>
 <html lang="en">
-<head>
-<title>Follow My Steps</title>
-<meta charset="utf-8">
-<style type="text/css">
-html {
-	height: 100%;
-}
-body {
-	margin: 0;
-	padding: 0;
-	background: #000000 url(/steps/loading.gif) center center no-repeat;
-	color: #ffffff;
-	font-family: sans-serif;
-	font-size: 13px;
-	line-height: 20px;
-	height: 100%;
-}
+  <head>
+    <title>Follow My Steps</title>
+    <meta charset="utf-8">
+    <style type="text/css">
+      html {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        background: #000000 url(/steps/loading.gif) center center no-repeat;
+        color: #ffffff;
+        font-family: sans-serif;
+        font-size: 13px;
+        line-height: 20px;
+        height: 100%;
+      }
 
-#info {
-	font-size: 11px;
-	position: absolute;
-	bottom: 5px;
-	background-color: rgba(0,0,0,0.8);
-	border-radius: 3px;
-	right: 10px;
-	padding: 10px;
-}
+      #info {
+        font-size: 11px;
+        position: absolute;
+        bottom: 5px;
+        background-color: rgba(0,0,0,0.8);
+        border-radius: 3px;
+        right: 10px;
+        padding: 10px;
+      }
 
-#currentInfo {
-	width: 270px;
-	position: absolute;
-	left: 20px;
-	top: 63px;
+      #currentInfo {
+        width: 270px;
+        position: absolute;
+        left: 20px;
+        top: 63px;
 
-	background-color: rgba(0,0,0,0.2);
+        background-color: rgba(0,0,0,0.2);
 
-	border-top: 1px solid rgba(255,255,255,0.4);
-	padding: 10px;
-}
+        border-top: 1px solid rgba(255,255,255,0.4);
+        padding: 10px;
+      }
 
-a {
-	color: #aaa;
-	text-decoration: none;
-}
-a:hover {
-	text-decoration: underline;
-  }
+      a {
+        color: #aaa;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
 
-  .bull {
-	  padding: 0 5px;
-	  color: #555;
-  }
+      .bull {
+        padding: 0 5px;
+        color: #555;
+      }
 
-  #title {
-	  position: absolute;
-	  top: 20px;
-	  width: 270px;
-	  left: 20px;
-	  background-color: rgba(0,0,0,0.2);
-	  border-radius: 3px;
-	  font: 20px Georgia;
-	  padding: 10px;
-  }
+      #title {
+        position: absolute;
+        top: 20px;
+        width: 270px;
+        left: 20px;
+        background-color: rgba(0,0,0,0.2);
+        border-radius: 3px;
+        font: 20px Georgia;
+        padding: 10px;
+      }
 
-  #ce span {
-	  display: none;
-  }
+      #ce span {
+        display: none;
+      }
 
-  #ce {
-	  width: 107px;
-	  height: 55px;
-	  display: block;
-	  position: absolute;
-	  bottom: 15px;
-	  left: 20px;
-	  background: url(/steps/ce.png);
-  }
+      #ce {
+        width: 107px;
+        height: 55px;
+        display: block;
+        position: absolute;
+        bottom: 15px;
+        left: 20px;
+        background: url(/steps/ce.png);
+      }
 
 
-</style>
-</head>
-<body>
+    </style>
+  </head>
+  <body>
 
-<div id="container"></div>
+  <div id="container"></div>
 
-<div id="info">
-	<strong><a href="http://www.chromeexperiments.com/globe">WebGL Globe</a></strong> <span class="bull">&bull;</span> Created by the Google Data Arts Team <span class="bull">&bull;</span> Modified by foreverbell
-</div>
+  <div id="info">
+    <strong><a href="http://www.chromeexperiments.com/globe">WebGL Globe</a></strong> <span class="bull">&bull;</span> Created by the Google Data Arts Team <span class="bull">&bull;</span> Modified by foreverbell
+  </div>
 
-<div id="title">
-	Follow My Steps
-</div>
+  <div id="title">
+    Follow My Steps
+  </div>
 
-<a id="ce" href="http://www.chromeexperiments.com/globe">
-	<span>This is a Chrome Experiment</span>
-</a>
+  <a id="ce" href="http://www.chromeexperiments.com/globe">
+    <span>This is a Chrome Experiment</span>
+  </a>
 
-<script type="text/javascript" src="/steps/third-party/Detector.js"></script>
-<script type="text/javascript" src="/steps/third-party/three.min.js"></script>
-<script type="text/javascript" src="/steps/third-party/Tween.js"></script>
-<script type="text/javascript" src="/steps/third-party/helvetiker_regular.typeface.js"></script>
-<script type="text/javascript" src="/steps/globe.js"></script>
-<script type="text/javascript">
+  <script type="text/javascript" src="/steps/third-party/Detector.js"></script>
+  <script type="text/javascript" src="/steps/third-party/three.min.js"></script>
+  <script type="text/javascript" src="/steps/third-party/Tween.js"></script>
+  <script type="text/javascript" src="/steps/third-party/helvetiker_regular.typeface.js"></script>
+  <script type="text/javascript" src="/steps/globe.js"></script>
+  <script type="text/javascript">
 
-if(!Detector.webgl) {
-	Detector.addGetWebGLMessage();
-} else {
+    if(!Detector.webgl) {
+      Detector.addGetWebGLMessage();
+    } else {
 
-	var container = document.getElementById('container');
-	var globe = new DAT.Globe(container);
+      var container = document.getElementById('container');
+      var globe = new DAT.Globe(container);
 
-	console.log(globe);
-	var i, tweens = [];
+      console.log(globe);
+      var i, tweens = [];
+      
+      var xhr;
+      TWEEN.start();
+      
+      xhr = new XMLHttpRequest();
+      xhr.open('GET', '/steps/city.json', true);
+      xhr.onreadystatechange = function(e) {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            var data = JSON.parse(xhr.responseText);
+            window.data = data;
+			globe.addData(data);
+            globe.animate();
+            document.body.style.backgroundImage = 'none'; // remove loading
+          }
+        }
+      };
+      xhr.send(null);
+    }
 
-	var xhr;
-	TWEEN.start();
+  </script>
 
-	xhr = new XMLHttpRequest();
-	xhr.open('GET', '/steps/city.json', true);
-	xhr.onreadystatechange = function(e) {
-		if (xhr.readyState === 4) {
-			if (xhr.status === 200) {
-				var data = JSON.parse(xhr.responseText);
-				window.data = data;
-				globe.addData(data);
-				globe.animate();
-				document.body.style.backgroundImage = 'none'; // remove loading
-			}
-		}
-	};
-	xhr.send(null);
-}
-
-</script>
-
-</body>
+  </body>
 
 </html>
