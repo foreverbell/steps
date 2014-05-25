@@ -4,7 +4,7 @@
 
 **Follow My Steps** supports data in `JSON` format. `globe.js` makes heavy use of the `Three.js` library (https://github.com/mrdoob/three.js).
 
-![](https://github.com/foreverbell/follow-my-steps/steps.png)
+![](https://raw.githubusercontent.com/foreverbell/follow-my-steps/master/steps.png)
 
 # Data Format
 
