@@ -1,77 +1,77 @@
 <!DOCTYPE HTML>
 <html lang="en">
-  <head>
-    <title>Follow My Steps</title>
-    <meta charset="utf-8">
-    <style type="text/css">
-      html {
-        height: 100%;
-      }
-      body {
-        margin: 0;
-        padding: 0;
-        background: #000000 url(/steps/loading.gif) center center no-repeat;
-        color: #ffffff;
-        font-family: sans-serif;
-        font-size: 13px;
-        line-height: 20px;
-        height: 100%;
-      }
+	<head>
+	<title>Follow My Steps</title>
+	<meta charset="utf-8">
+	<style type="text/css">
+	html {
+		height: 100%;
+	}
+	body {
+		margin: 0;
+		padding: 0;
+		background: #000000 url(/steps/loading.gif) center center no-repeat;
+		color: #ffffff;
+		font-family: sans-serif;
+		font-size: 13px;
+		line-height: 20px;
+		height: 100%;
+	}
 
-      #info {
-        font-size: 11px;
-        position: absolute;
-        bottom: 5px;
-        background-color: rgba(0,0,0,0.8);
-        border-radius: 3px;
-        right: 10px;
-        padding: 10px;
-      }
+	#info {
+		font-size: 11px;
+		position: absolute;
+		bottom: 5px;
+		background-color: rgba(0,0,0,0.8);
+		border-radius: 3px;
+		right: 10px;
+		padding: 10px;
+	}
 
-	  #options {
+	#options {
 		width: 150px;
 		position: absolute;
 		left: 30px;
 		top: 60px;
-	 
-        background-color: rgba(0,0,0,0.2);
-        border-top: 1px solid rgba(255,255,255,0.4);
-        padding: 10px;
-	  }
 
-	  #optionText {
+		background-color: rgba(0,0,0,0.2);
+		border-top: 1px solid rgba(255,255,255,0.4);
+		padding: 10px;
+	}
+
+	#optionText {
 		font: 15px Georgia;
-	  }
+	}
 
-      a {
-        color: #aaa;
-        text-decoration: none;
-      }
-      a:hover {
-        text-decoration: underline;
-      }
+	a {
+		color: #aaa;
+		text-decoration: none;
+	}
+	a:hover {
+		text-decoration: underline;
+	}
 
-      .bull {
-        padding: 0 5px;
-        color: #555;
-      }
+	.bull {
+		padding: 0 5px;
+		color: #555;
+	}
 
-      #title {
-        position: absolute;
-        top: 20px;
-        width: 270px;
-        left: 20px;
-        background-color: rgba(0,0,0,0.2);
-        border-radius: 3px;
-        font: 20px Georgia;
-        padding: 10px;
-      }
-	  
-	  #forkme span {
-        display: none;
-      }
-	  
-	  #forkme {
+	#title {
+		position: absolute;
+		top: 20px;
+		width: 270px;
+		left: 20px;
+		background-color: rgba(0,0,0,0.2);
+		border-radius: 3px;
+		font: 20px Georgia;
+		padding: 10px;
+	}
+
+	#forkme span {
+		display: none;
+	}
+
+	#forkme {
 		width: 149px;
 		height: 149px;
 		position: absolute;
@@ -80,82 +80,81 @@
 		right: 0px; 
 		border: 0;
 		background: url(/steps/forkme.png);
-	  }
-
-    </style>
-  </head>
-  <body>
-
-  <div id="container"></div>
-
-  <div id="info">
-    Powered by <strong><a href="http://www.chromeexperiments.com/globe">WebGL Globe</a></strong> <span class="bull">&bull;</span> Created by <strong><a href="http://github.com/foreverbell">foreverbell</a></strong><span class="bull">&bull;</span> Released under the <strong><a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License</a></strong>
-  </div>
-
-  <div id="title">
-    Follow My Steps
-  </div>
-
-  <a id="forkme" href="https://github.com/foreverbell/follow-my-steps">
-	<span>Fork me on github</span>
-  </a>
-
-  <div id="options">
-	<input type="checkbox" name="autospin" value="autospin" checked="yes" onclick="autospinOnClick(this)"></input>
-	<label id="optionText">Auto Spin</label>
-	<br>
-	<input type="checkbox" name="starfield" value="starfield" checked="yes" onclick="starfieldOnClick(this)"></input>
-	<label id="optionText">Starfield</label>
-  </div>
- 
-  <script type="text/javascript" src="/steps/third-party/Detector.js"></script>
-  <script type="text/javascript" src="/steps/third-party/three.min.js"></script>
-  <script type="text/javascript" src="/steps/third-party/Tween.js"></script>
-  <script type="text/javascript" src="/steps/third-party/helvetiker_regular.typeface.js"></script>
-  <script type="text/javascript" src="/steps/globe.js"></script>
-  <script type="text/javascript">
-
-	var globe;
-
-	function autospinOnClick(checkbox) {
-		globe.autospin = checkbox.checked;
 	}
 
-	function starfieldOnClick(checkbox) {
-		globe.starfield = checkbox.checked;
-	}
+	</style>
+	</head>
+	
+	<body>
 
-    if(!Detector.webgl) {
-      Detector.addGetWebGLMessage();
-    } else {
+	<div id="container"></div>
 
-      var container = document.getElementById('container');
-      
-	  globe = new DAT.Globe(container);
+	<div id="info">
+		Powered by <strong><a href="http://www.chromeexperiments.com/globe">WebGL Globe</a></strong> <span class="bull">&bull;</span> Created by <strong><a href="http://github.com/foreverbell">foreverbell</a></strong><span class="bull">&bull;</span> Released under the <strong><a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License</a></strong>
+	</div>
 
-      var i, tweens = [];
-      
-      var xhr;
-      TWEEN.start();
-      
-      xhr = new XMLHttpRequest();
-      xhr.open('GET', '/steps/city.json', true);
-      xhr.onreadystatechange = function(e) {
-        if (xhr.readyState === 4) {
-          if (xhr.status === 200) {
-            var data = JSON.parse(xhr.responseText);
-            window.data = data;
-			globe.addData(data);
-            globe.animate();
-            document.body.style.backgroundImage = 'none'; // remove loading
-          }
-        }
-      };
-      xhr.send(null);
-    }
+	<div id="title">
+		Follow My Steps
+	</div>
 
-  </script>
+	<a id="forkme" href="https://github.com/foreverbell/follow-my-steps">
+		<span>Fork me on github</span>
+	</a>
 
-  </body>
+	<div id="options">
+		<input type="checkbox" name="autospin" value="autospin" checked="yes" onclick="autospinOnClick(this)"></input>
+		<label id="optionText">Auto Spin</label>
+		<br>
+		<input type="checkbox" name="starfield" value="starfield" checked="yes" onclick="starfieldOnClick(this)"></input>
+		<label id="optionText">Starfield</label>
+	</div>
+
+	<script type="text/javascript" src="/steps/third-party/Detector.js"></script>
+	<script type="text/javascript" src="/steps/third-party/three.min.js"></script>
+	<script type="text/javascript" src="/steps/third-party/Tween.js"></script>
+	<script type="text/javascript" src="/steps/third-party/helvetiker_regular.typeface.js"></script>
+	<script type="text/javascript" src="/steps/globe.js"></script>
+	<script type="text/javascript">
+
+		var globe;
+
+		function autospinOnClick(checkbox) {
+			globe.autospin = checkbox.checked;
+		}
+
+		function starfieldOnClick(checkbox) {
+			globe.starfield = checkbox.checked;
+		}
+
+		if(!Detector.webgl) {
+			Detector.addGetWebGLMessage();
+		} else {
+
+			var container = document.getElementById('container');
+
+			globe = new DAT.Globe(container);
+			
+			var xhr;
+			TWEEN.start();
+
+			xhr = new XMLHttpRequest();
+			xhr.open('GET', '/steps/city.json', true);
+			xhr.onreadystatechange = function(e) {
+				if (xhr.readyState === 4) {
+					if (xhr.status === 200) {
+						var data = JSON.parse(xhr.responseText);
+						window.data = data;
+						globe.addData(data);
+						globe.animate();
+						document.body.style.backgroundImage = 'none'; // remove loading
+					}
+				}
+			};
+			xhr.send(null);
+		}
+
+	</script>
+
+	</body>
 
 </html>
