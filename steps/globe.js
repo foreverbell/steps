@@ -204,19 +204,18 @@ DAT.Globe = function(container, opts) {
 	}
 
 	addData = function(data) {
-		var lat, lng, color, uri, i, step, colorFnWrapper;
+		var lat, lng, color, uri, i, colorFnWrapper;
 
-		step = 5;
-		colorFnWrapper = function(data, i) { return colorFn(data[i + 3]); }
+		colorFnWrapper = function(data, i) { return colorFn(data[i][3]); }
 		
-		for (i = 0; i < data.length; i += step) {
+		for (i = 0; i < data.length; i += 1) {
 			var subgeo = new THREE.Geometry();
 			
-			city = data[i];
-			lat = data[i + 1];
-			lng = data[i + 2];
+			city = data[i][0];
+			lat = data[i][1];
+			lng = data[i][2];
 			color = colorFnWrapper(data, i);
-			uri = data[i + 4];
+			uri = data[i][4];
 
 			addCity(lat, lng, city, color, 1.5, 0, uri, subgeo, true);
 			

@@ -1,11 +1,11 @@
 [
-	"Shanghai", 31.2, 121.5, 2, "/steps/journey/shanghai.html",
-	"Beijing", 40.0, 116.3, 1.5, "/steps/journey/beijing.html",
-	"Washington", 38.5, -77.0, 1.2, "http://en.wikipedia.org/wiki/Washington,_D.C.",
-	"Moscow", 55.5, 37.5, 1.0, "http://en.wikipedia.org/wiki/Moscow",
-	"Paris", 48.5, 2.2, 0.9, "http://en.wikipedia.org/wiki/Paris",
-	"Sydney", -33.9, 150.9, 0.8, "http://en.wikipedia.org/wiki/Sydney",
-	"Los Angeles", 34.0, -118.25, 0.7, "http://en.wikipedia.org/wiki/Los_Angeles",
-	"Tokyo", 35.68, 139.69, 0.4, "http://en.wikipedia.org/wiki/Tokyo",
-	"Taipei", 25.0, 121.3, 0.2, "http://en.wikipedia.org/wiki/Taipei"			
+	["Shanghai", 31.2, 121.5, 2, "/steps/journey/shanghai.html"],
+	["Beijing", 40.0, 116.3, 1.5, "/steps/journey/beijing.html"],
+	["Washington", 38.5, -77.0, 1.2, "http://en.wikipedia.org/wiki/Washington,_D.C."],
+	["Moscow", 55.5, 37.5, 1.0, "http://en.wikipedia.org/wiki/Moscow"],
+	["Paris", 48.5, 2.2, 0.9, "http://en.wikipedia.org/wiki/Paris"],
+	["Sydney", -33.9, 150.9, 0.8, "http://en.wikipedia.org/wiki/Sydney"],
+	["Los Angeles", 34.0, -118.25, 0.7, "http://en.wikipedia.org/wiki/Los_Angeles"],
+	["Tokyo", 35.68, 139.69, 0.4, "http://en.wikipedia.org/wiki/Tokyo"],
+	["Taipei", 25.0, 121.3, 0.2, "http://en.wikipedia.org/wiki/Taipei"]		
 ]
