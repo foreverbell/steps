@@ -39,7 +39,7 @@
 		padding: 10px;
 	}
 
-	#optionText {
+	.optionText {
 		font: 15px Georgia;
 	}
 
@@ -102,11 +102,11 @@
 	</a>
 
 	<div id="options">
-		<input type="checkbox" name="autospin" value="autospin" checked="yes" onclick="autospinOnClick(this)"></input>
-		<label id="optionText">Auto Spin</label>
+		<input type="checkbox" name="autospin" value="autospin" checked="checked" onclick="autospinOnClick(this)">
+		<span class="optionText">Auto Spin</span>
 		<br>
-		<input type="checkbox" name="starfield" value="starfield" checked="yes" onclick="starfieldOnClick(this)"></input>
-		<label id="optionText">Starfield</label>
+		<input type="checkbox" name="starfield" value="starfield" checked="checked" onclick="starfieldOnClick(this)">
+		<span class="optionText">Starfield</span>
 	</div>
 
 	<script type="text/javascript" src="/steps/third-party/Detector.js"></script>
