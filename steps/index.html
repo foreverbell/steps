@@ -28,17 +28,20 @@
         padding: 10px;
       }
 
-      #currentInfo {
-        width: 270px;
-        position: absolute;
-        left: 20px;
-        top: 63px;
-
+	  #options {
+		width: 150px;
+		position: absolute;
+		left: 30px;
+		top: 60px;
+	 
         background-color: rgba(0,0,0,0.2);
-
         border-top: 1px solid rgba(255,255,255,0.4);
         padding: 10px;
-      }
+	  }
+
+	  #optionText {
+		font: 15px Georgia;
+	  }
 
       a {
         color: #aaa;
@@ -97,6 +100,14 @@
 	<span>Fork me on github</span>
   </a>
 
+  <div id="options">
+	<input type="checkbox" name="autospin" value="autospin" checked="yes" onclick="autospinOnClick(this)"></input>
+	<label id="optionText">Auto Spin</label>
+	<br>
+	<input type="checkbox" name="starfield" value="starfield" checked="yes" onclick="starfieldOnClick(this)"></input>
+	<label id="optionText">Starfield</label>
+  </div>
+ 
   <script type="text/javascript" src="/steps/third-party/Detector.js"></script>
   <script type="text/javascript" src="/steps/third-party/three.min.js"></script>
   <script type="text/javascript" src="/steps/third-party/Tween.js"></script>
@@ -104,14 +115,24 @@
   <script type="text/javascript" src="/steps/globe.js"></script>
   <script type="text/javascript">
 
+	var globe;
+
+	function autospinOnClick(checkbox) {
+		globe.autospin = checkbox.checked;
+	}
+
+	function starfieldOnClick(checkbox) {
+		globe.starfield = checkbox.checked;
+	}
+
     if(!Detector.webgl) {
       Detector.addGetWebGLMessage();
     } else {
 
       var container = document.getElementById('container');
-      var globe = new DAT.Globe(container);
+      
+	  globe = new DAT.Globe(container);
 
-      console.log(globe);
       var i, tweens = [];
       
       var xhr;

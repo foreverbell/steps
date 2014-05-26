@@ -72,7 +72,7 @@ DAT.Globe = function(container, opts) {
 	};
 
 	var camera, scene, renderer;
-	var mesh, atmosphere, point, text;
+	var mesh, atmosphere, point, text, starfieldMesh;
 	var sphere;
 	var pointMeshes = [];
 	var projector;
@@ -81,6 +81,7 @@ DAT.Globe = function(container, opts) {
 
 	var curZoomSpeed = 0;
 	var zoomSpeed = 50;
+	var spinInterval = 100;
 
 	var mouse = { x: 0, y: 0 }, mouseOnDown = { x: 0, y: 0 };
 	var rotation = { x: 0, y: 0 },
@@ -94,7 +95,7 @@ DAT.Globe = function(container, opts) {
 	var cities = [], activeCity = -1;
 
 	var mouseDownOn = false;
-	var timer;
+	var timer, spinTimer;
 
 	function init() {
 
@@ -106,6 +107,7 @@ DAT.Globe = function(container, opts) {
 		w = container.offsetWidth || window.innerWidth;
 		h = container.offsetHeight || window.innerHeight;
 
+		// camera & scene {{{
 		camera = new THREE.PerspectiveCamera(30, w / h, 1, 20000);
 		camera.position.z = distance;
 		
@@ -114,7 +116,9 @@ DAT.Globe = function(container, opts) {
 
 		projector = new THREE.Projector();
 		scene = new THREE.Scene();
+		// }}}
 
+		// globe {{{
 		var geometry = new THREE.SphereGeometry(200, 40, 30);
 
 		shader = Shaders['earth'];
@@ -133,7 +137,9 @@ DAT.Globe = function(container, opts) {
 		sphere = new THREE.Mesh(geometry, material);
 		sphere.rotation.y = Math.PI;
 		scene.add(sphere);
+		// }}}
 
+		// atmosphere {{{
 		shader = Shaders['atmosphere'];
 		uniforms = THREE.UniformsUtils.clone(shader.uniforms);
 
@@ -151,11 +157,13 @@ DAT.Globe = function(container, opts) {
 		mesh = new THREE.Mesh(geometry, material);
 		mesh.scale.set(1.1, 1.1, 1.1);
 		scene.add(mesh);
+		// }}}
 
+		// point {{{
 		geometry = new THREE.CubeGeometry(0.75, 0.75, 1);
 		geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -0.5));
-
 		point = new THREE.Mesh(geometry);
+		/// }}}
 
 		// starfield-background {{{
 		var texture = THREE.ImageUtils.loadTexture(imgDir + 'starfield.jpg');
@@ -172,8 +180,13 @@ DAT.Globe = function(container, opts) {
 			cubeMaterials.push(material);
 		}
 
-		var starfieldMesh = new THREE.Mesh(new THREE.CubeGeometry(10001, 10001, 10001), new THREE.MeshFaceMaterial(cubeMaterials));
+		starfieldMesh = new THREE.Mesh(new THREE.CubeGeometry(10001, 10001, 10001), new THREE.MeshFaceMaterial(cubeMaterials));
+		starfieldMesh.name = 'starfield';
 		scene.add(starfieldMesh); 
+		// }}}
+		
+		// auto-spin {{{
+		spinTimer = setInterval( function() { rotate(); }, spinInterval);
 		// }}}
 		
 		renderer = new THREE.WebGLRenderer({antialias: true});
@@ -462,6 +475,10 @@ DAT.Globe = function(container, opts) {
 		distanceTarget = distanceTarget < 350 ? 350 : distanceTarget;
 	}
 
+	function rotate() {
+		target.x -= 0.0005;
+	}
+
 	function animate() {
 		requestAnimationFrame(animate);
 		render();
@@ -484,6 +501,30 @@ DAT.Globe = function(container, opts) {
 	}
 
 	init();
+
+	this.__defineSetter__('autospin', function(enabled) {
+		if (spinTimer !== null) {
+			clearInterval(spinTimer);
+			spinTimer = null;
+		}
+		if (enabled) {
+			spinTimer = setInterval( function() { rotate(); }, spinInterval);
+		}
+	});
+
+	this.__defineSetter__('starfield', function(enabled) {
+		var obj = scene.getObjectByName('starfield', false);
+		if (enabled) {
+			if (obj === undefined) {
+				scene.add(starfieldMesh);
+			}
+		} else {
+			if (obj !== undefined) {
+				scene.remove(starfieldMesh);
+			}
+		}
+	});
+
 	this.animate = animate;
 	this.addData = addData;
 	this.renderer = renderer;
