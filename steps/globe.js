@@ -72,8 +72,7 @@ DAT.Globe = function(container, opts) {
 	};
 
 	var camera, scene, renderer;
-	var mesh, atmosphere, point, text, starfieldMesh;
-	var sphere;
+	var atmosphereMesh, point, text, starfieldMesh, sphere;
 	var pointMeshes = [];
 	var projector;
 	
@@ -95,7 +94,7 @@ DAT.Globe = function(container, opts) {
 	var cities = [], activeCity = -1;
 
 	var mouseDownOn = false;
-	var timer, spinTimer;
+	var timer, spinTimer = null;
 
 	function init() {
 
@@ -154,9 +153,10 @@ DAT.Globe = function(container, opts) {
 
 		});
 
-		mesh = new THREE.Mesh(geometry, material);
-		mesh.scale.set(1.1, 1.1, 1.1);
-		scene.add(mesh);
+		atmosphereMesh = new THREE.Mesh(geometry, material);
+		atmosphereMesh.scale.set(1.1, 1.1, 1.1);
+		atmosphereMesh.name = 'atmosphere';
+		scene.add(atmosphereMesh);
 		// }}}
 
 		// point {{{
@@ -186,7 +186,7 @@ DAT.Globe = function(container, opts) {
 		// }}}
 		
 		// auto-spin {{{
-		spinTimer = setInterval( function() { rotate(); }, spinInterval);
+		spinTimer = setInterval( function() { rotate(0.0005); }, spinInterval);
 		// }}}
 		
 		renderer = new THREE.WebGLRenderer({antialias: true});
@@ -263,7 +263,7 @@ DAT.Globe = function(container, opts) {
 		point.position.y = 200 * Math.cos(phi);
 		point.position.z = 200 * Math.sin(phi) * Math.sin(theta);
 
-		point.lookAt(mesh.position);
+		point.lookAt(sphere.position);
 
 		point.scale.x = scale;
 		point.scale.y = scale;
@@ -326,14 +326,14 @@ DAT.Globe = function(container, opts) {
 	}
 
 	function findClosestCity(point) {
-		point.sub(mesh.position).normalize();
+		point.sub(sphere.position).normalize();
 
 		var city;
 		var i, index = -1, best, dist;
 
 		for (i = 0; i < cities.length; i += 1) {
 			city = cities[i].position.clone();
-			city.sub(mesh.position).normalize();
+			city.sub(sphere.position).normalize();
 			dist = city.dot(point);
 			if (index === -1 || dist > best) {
 				index = i;
@@ -382,7 +382,6 @@ DAT.Globe = function(container, opts) {
 	function setActiveCity(newCity) {
 		activeCity = newCity;
 		if (newCity !== -1) {
-			// drawText(cities[newCity].name, cities[newCity].color, cities[newCity].phi, cities[newCity].theta);
 			var tween = new TWEEN.Tween({var: pointMeshes[activeCity].morphTargetInfluences[0]})
 				.to({var: 1}, 200)
 				.easing(TWEEN.Easing.Cubic.EaseIn)
@@ -460,6 +459,14 @@ DAT.Globe = function(container, opts) {
 				zoom(-100);
 				event.preventDefault();
 				break;
+			case 37:
+				rotate(1);
+				event.preventDefault();
+				break;
+			case 39:
+				rotate(-1);
+				event.preventDefault();
+				break;
 		}
 	}
 
@@ -475,8 +482,8 @@ DAT.Globe = function(container, opts) {
 		distanceTarget = distanceTarget < 350 ? 350 : distanceTarget;
 	}
 
-	function rotate() {
-		target.x -= 0.0005;
+	function rotate(delta) {
+		target.x -= delta;
 	}
 
 	function animate() {
@@ -495,20 +502,18 @@ DAT.Globe = function(container, opts) {
 		camera.position.y = distance * Math.sin(rotation.y);
 		camera.position.z = distance * Math.cos(rotation.x) * Math.cos(rotation.y);
 
-		camera.lookAt(mesh.position);
+		camera.lookAt(sphere.position);
 
 		renderer.render(scene, camera);
 	}
 
-	init();
-
 	this.__defineSetter__('autospin', function(enabled) {
-		if (spinTimer !== null) {
+		if (spinTimer != null) {
 			clearInterval(spinTimer);
 			spinTimer = null;
 		}
 		if (enabled) {
-			spinTimer = setInterval( function() { rotate(); }, spinInterval);
+			spinTimer = setInterval( function() { rotate(0.0005); }, spinInterval);
 		}
 	});
 
@@ -524,7 +529,22 @@ DAT.Globe = function(container, opts) {
 			}
 		}
 	});
+	
+	this.__defineSetter__('atmosphere', function(enabled) {
+		var obj = scene.getObjectByName('atmosphere', false);
+		if (enabled) {
+			if (obj === undefined) {
+				scene.add(atmosphereMesh);
+			}
+		} else {
+			if (obj !== undefined) {
+				scene.remove(atmosphereMesh);
+			}
+		}
+	});
 
+	init();
+	
 	this.animate = animate;
 	this.addData = addData;
 	this.renderer = renderer;

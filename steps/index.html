@@ -107,6 +107,9 @@
 		<br>
 		<input type="checkbox" name="starfield" value="starfield" checked="checked" onclick="starfieldOnClick(this)">
 		<span class="optionText">Starfield</span>
+		<br>
+		<input type="checkbox" name="atmosphere" value="atmosphere" checked="checked" onclick="atmosphereOnClick(this)">
+		<span class="optionText">Atmosphere</span>
 	</div>
 
 	<script type="text/javascript" src="/steps/third-party/Detector.js"></script>
@@ -124,6 +127,10 @@
 
 		function starfieldOnClick(checkbox) {
 			globe.starfield = checkbox.checked;
+		}
+
+		function atmosphereOnClick(checkbox) {
+			globe.atmosphere = checkbox.checked;
 		}
 
 		if(!Detector.webgl) {
