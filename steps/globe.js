@@ -88,7 +88,6 @@ DAT.Globe = function(container, opts) {
   targetOnDown = { x: 0, y: 0 };
 
   var distance = 10000, distanceTarget = 10000;
-  var padding = 40;
   var PI_HALF = Math.PI / 2;
 
   var cities = [], activeCity = -1;
@@ -347,24 +346,6 @@ DAT.Globe = function(container, opts) {
     return index;
   }
 
-  function onMouseDown(event) {
-    event.preventDefault();
-
-    // container.addEventListener('mousemove', onMouseMove, false);
-    container.addEventListener('mouseup', onMouseUp, false);
-    container.addEventListener('mouseout', onMouseOut, false);
-
-    mouseOnDown.x = - event.clientX;
-    mouseOnDown.y = event.clientY;
-
-    targetOnDown.x = target.x;
-    targetOnDown.y = target.y;
-
-    container.style.cursor = 'move';
-
-    mouseDownOn = true;
-  }
-
   function clearActiveCity() {
     if (activeCity !== -1) {
       var saved = activeCity;
@@ -392,6 +373,24 @@ DAT.Globe = function(container, opts) {
     }
   }
 
+  function onMouseDown(event) {
+    event.preventDefault();
+
+    // container.addEventListener('mousemove', onMouseMove, false);
+    container.addEventListener('mouseup', onMouseUp, false);
+    container.addEventListener('mouseout', onMouseOut, false);
+
+    mouseOnDown.x = - event.clientX;
+    mouseOnDown.y = event.clientY;
+
+    targetOnDown.x = target.x;
+    targetOnDown.y = target.y;
+
+    container.style.cursor = 'move';
+
+    mouseDownOn = true;
+  }
+  
   function onMouseMove(event) {
     if (mouseDownOn === true) {
       mouse.x = - event.clientX;
