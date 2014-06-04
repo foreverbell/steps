@@ -12,7 +12,7 @@
  * 
  * Modified by foreverbell<dql.foreverbell@gmail.com> to use it in
  * the project follow-my-steps.
-*/
+ */
 
 var DAT = DAT || {};
 
