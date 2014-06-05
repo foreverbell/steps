@@ -1,6 +1,6 @@
 [
-	["Shanghai", 31.2, 121.5, 2, "/steps/data/shanghai.html"],
-	["Beijing", 40.0, 116.3, 1.5, "/steps/data/beijing.html"],
+	["Shanghai", 31.2, 121.5, 2, "data/shanghai.html"],
+	["Beijing", 40.0, 116.3, 1.5, "data/beijing.html"],
 	["Washington", 38.5, -77.0, 1.2, "http://en.wikipedia.org/wiki/Washington,_D.C."],
 	["Moscow", 55.5, 37.5, 1.0, "http://en.wikipedia.org/wiki/Moscow"],
 	["Paris", 48.5, 2.2, 0.9, "http://en.wikipedia.org/wiki/Paris"],

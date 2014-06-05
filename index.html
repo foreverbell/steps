@@ -10,7 +10,7 @@
   body {
     margin: 0;
     padding: 0;
-    background: #000000 url(/steps/img/loading.gif) center center no-repeat;
+    background: #000000 url(img/loading.gif) center center no-repeat;
     color: #ffffff;
     font-family: sans-serif;
     font-size: 13px;
@@ -79,7 +79,7 @@
     top: 0px; 
     right: 0px; 
     border: 0;
-    background: url(/steps/img/forkme.png);
+    background: url(img/forkme.png);
   }
 
   </style>
@@ -112,11 +112,11 @@
     <span class="optionText">Atmosphere</span>
   </div>
 
-  <script type="text/javascript" src="/steps/js/third-party/Detector.min.js"></script>
-  <script type="text/javascript" src="/steps/js/third-party/three.min.js"></script>
-  <script type="text/javascript" src="/steps/js/third-party/Tween.min.js"></script>
-  <script type="text/javascript" src="/steps/js/third-party/helvetiker_regular.typeface.min.js"></script>
-  <script type="text/javascript" src="/steps/js/globe.js"></script>
+  <script type="text/javascript" src="js/third-party/Detector.min.js"></script>
+  <script type="text/javascript" src="js/third-party/three.min.js"></script>
+  <script type="text/javascript" src="js/third-party/Tween.min.js"></script>
+  <script type="text/javascript" src="js/third-party/helvetiker_regular.typeface.min.js"></script>
+  <script type="text/javascript" src="js/globe.js"></script>
   <script type="text/javascript">
 
     var globe;
@@ -145,7 +145,7 @@
       TWEEN.start();
 
       xhr = new XMLHttpRequest();
-      xhr.open('GET', '/steps/data/city.json', true);
+      xhr.open('GET', 'data/city.json', true);
       xhr.onreadystatechange = function(e) {
         if (xhr.readyState === 4) {
           if (xhr.status === 200) {

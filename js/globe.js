@@ -10,8 +10,8 @@
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Modified by foreverbell<dql.foreverbell@gmail.com> to use it in
- * the project follow-my-steps.
+ * Modified by foreverbell<dql.foreverbell#gmail.com> to use it in
+ * the project steps.
  */
 
 var DAT = DAT || {};
@@ -24,7 +24,7 @@ DAT.Globe = function(container, opts) {
     c.setHSL( ( 0.6 - ( x * 0.5 ) ), 1.0, 0.5 );
     return c;
   };
-  var imgDir = opts.imgDir || '/steps/img/';
+  var imgDir = opts.imgDir || 'img/';
 
   var Shaders = {
     'earth' : {

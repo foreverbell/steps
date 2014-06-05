@@ -1,12 +1,12 @@
-# Follow My Steps
+# Steps
 
-**Follow My Steps** is a project showing your steps around the world. This project is based on **WebGL Globe** created by Google Data Arts Team (https://github.com/dataarts/webgl-globe).
+**Steps** is a project showing your steps around the world. This project is based on **WebGL Globe** created by Google Data Arts Team (https://github.com/dataarts/webgl-globe).
 
 You can mark the cities you have travelled on the globe, and link them to your blog post.
 
-**Follow My Steps** supports data in `JSON` format. `globe.js` makes heavy use of the `Three.js` library (https://github.com/mrdoob/three.js).
+**Steps** supports data in `JSON` format. `globe.js` makes heavy use of the `Three.js` library (https://github.com/mrdoob/three.js).
 
-![](https://raw.githubusercontent.com/foreverbell/follow-my-steps/master/steps.png)
+![](https://raw.githubusercontent.com/foreverbell/steps/master/img/steps.png)
 
 # Data Format
 
@@ -17,12 +17,18 @@ The following illustrates the `JSON` data format that we except:
 		...
 	]
 
+See the `city.json` in `/data` as an example.
+
 # Example
 
-**Follow My Steps** can easily be ported to your blog, here is an example, see http://foreverbell.0ginr.com/steps/ .
+**Steps** can easily be ported to your blog, here is an example, see http://foreverbell.0ginr.com/steps/ .
 
 # Local Test
 
 We recommend you use `python` to set up a simple http server. 
 
-Run command `python -m SimpleHTTPServer`, then go to `http://127.0.0.1:8000/steps/` to see what happens :)
+Run command `python -m SimpleHTTPServer`, or just simply `make server`, then go to `http://127.0.0.1:8000/` to see what happens :)
+
+# License
+
+Apache License, Version 2.0.
