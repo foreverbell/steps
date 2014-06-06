@@ -17,7 +17,7 @@ The following illustrates the `JSON` data format that we except:
 		...
 	]
 
-Here, the first three items are the city's name and location, then `colorHue` means the hue of city's color (See `HSL` on `Wikipedia`, http://en.wikipedia.org/wiki/HSL\_and\_HSV, **which should between 0.0 and 1.0**), and the last one `linkURI` is the new URL to open when the user clicks the respective city on the globe.
+Here, the first three items are the city's name and location, then `colorHue` means the hue of city's color (See `HSL` on `Wikipedia`, http://en.wikipedia.org/wiki/HSL_and_HSV, **which should between 0.0 and 1.0**), and the last one `linkURI` is the new URL to open when the user clicks the respective city on the globe.
 
 See the `city.json` in `/data` as an example.
 
