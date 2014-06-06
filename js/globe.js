@@ -73,6 +73,7 @@ DAT.Globe = function(container, opts) {
 
   var camera, scene, renderer;
   var atmosphereMesh, point, text, starfieldMesh, sphere;
+  var hollowCircle, focusCircles = [];
   var pointMeshes = [];
   var projector;
   
@@ -93,7 +94,8 @@ DAT.Globe = function(container, opts) {
   var cities = [], activeCity = -1;
 
   var mouseDownOn = false;
-  var timer, spinTimer = null;
+  var timer, focusCircleTimer, spinTimer = null;
+  var innerFocusCircleRadius;
 
   function init() {
 
@@ -164,6 +166,29 @@ DAT.Globe = function(container, opts) {
     point = new THREE.Mesh(geometry);
     /// }}}
 
+    // hollow-circle && focus-circle {{{
+    geometry = new THREE.Geometry();
+    var i, NSEGMENTS = 32;
+    for (i = 0; i <= NSEGMENTS; i += 1) {
+      var x = Math.cos(i / NSEGMENTS * 2 * Math.PI);
+      var y = Math.sin(i / NSEGMENTS * 2 * Math.PI);
+      var vertex = new THREE.Vector3(x, y, 0);
+      geometry.vertices.push(vertex);
+    }
+    material = new THREE.LineBasicMaterial({ 
+      color: 0xcccccc, 
+      linewidth: 2 
+    });
+    hollowCircle = new THREE.Line(geometry, material);
+    for (i = 0; i < 3; i += 1) {
+      focusCircles.push(hollowCircle.clone());
+    }
+    for (i = 0; i < 3; i += 1) {
+      focusCircles[i].visible = false;
+      scene.add(focusCircles[i]);
+    }
+    // }}}
+    
     // starfield-background {{{
     var texture = THREE.ImageUtils.loadTexture(imgDir + 'starfield.jpg');
     texture.wrapS = THREE.RepeatWrapping;
@@ -356,6 +381,14 @@ DAT.Globe = function(container, opts) {
           pointMeshes[saved].morphTargetInfluences[0] = this.var; 
         })
         .start();
+
+      var i;
+      for (i = 0; i < 3; i += 1) {
+        focusCircles[i].visible = false;
+        focusCircles[i].scale.x = 1;
+        focusCircles[i].scale.y = 1;
+      }
+      clearInterval(focusCirclesTimer);
     }
     activeCity = -1;
   }
@@ -370,6 +403,30 @@ DAT.Globe = function(container, opts) {
           pointMeshes[newCity].morphTargetInfluences[0] = this.var;
         })
         .start();
+  
+      var i;
+      for (i = 0; i < 3; i += 1) {
+        focusCircles[i].position = cities[activeCity].position;
+        focusCircles[i].lookAt(sphere.position);
+      }
+      innerFocusCircleRadius = 0;
+      focusCirclesTimer = setInterval( function() {
+        var i, radius = innerFocusCircleRadius;
+        for (i = 0; i < 3; i += 1) {
+          if (radius <= 12) {
+            focusCircles[i].scale.x = radius / 4 + 1;
+            focusCircles[i].scale.y = radius / 4 + 1;
+          }
+          radius += 3;
+        }
+        innerFocusCircleRadius += 1;
+        if (innerFocusCircleRadius >= 12) {
+          innerFocusCircleRadius = 0;
+        }
+      }, 120);
+      for (i = 0; i < 3; i += 1) {
+        focusCircles[i].visible = true;
+      }
     }
   }
 
@@ -469,7 +526,7 @@ DAT.Globe = function(container, opts) {
     }
   }
 
-  function onWindowResize( event ) {
+  function onWindowResize(event) {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize( window.innerWidth, window.innerHeight );
