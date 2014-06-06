@@ -13,9 +13,11 @@ You can mark the cities you have travelled on the globe, and link them to your b
 The following illustrates the `JSON` data format that we except:
 
 	var data = [
-		[cityName, latitude, longitude, starRate, linkURI],
+		[cityName, latitude, longitude, colorHue, linkURI],
 		...
 	]
+
+Here, the first three items are the city's name and location, then `colorHue` means the hue of city's color (See `HSL` on `Wikipedia`, http://en.wikipedia.org/wiki/HSL\_and\_HSV, **which should between 0.0 and 1.0**), and the last one `linkURI` is the new URL to open when the user clicks the respective city on the globe.
 
 See the `city.json` in `/data` as an example.
 
