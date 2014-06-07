@@ -94,8 +94,8 @@ DAT.Globe = function(container, opts) {
   var cities = [], activeCity = -1;
 
   var mouseDownOn = false;
-  var timer, focusCircleTimer, spinTimer = null;
-  var innerFocusCircleRadius;
+  var timer, circleTimer, spinTimer;
+  var innerRadius;
 
   function init() {
 
@@ -388,7 +388,7 @@ DAT.Globe = function(container, opts) {
         focusCircles[i].scale.x = 1;
         focusCircles[i].scale.y = 1;
       }
-      clearInterval(focusCirclesTimer);
+      clearInterval(circleTimer);
     }
     activeCity = -1;
   }
@@ -409,9 +409,9 @@ DAT.Globe = function(container, opts) {
         focusCircles[i].position = cities[activeCity].position;
         focusCircles[i].lookAt(sphere.position);
       }
-      innerFocusCircleRadius = 0;
-      focusCirclesTimer = setInterval( function() {
-        var i, radius = innerFocusCircleRadius;
+      innerRadius = 0;
+      circleTimer = setInterval( function() {
+        var i, radius = innerRadius;
         for (i = 0; i < 3; i += 1) {
           if (radius <= 12) {
             focusCircles[i].scale.x = radius / 4 + 1;
@@ -419,9 +419,9 @@ DAT.Globe = function(container, opts) {
           }
           radius += 3;
         }
-        innerFocusCircleRadius += 1;
-        if (innerFocusCircleRadius >= 12) {
-          innerFocusCircleRadius = 0;
+        innerRadius += 1;
+        if (innerRadius >= 12) {
+          innerRadius = 0;
         }
       }, 120);
       for (i = 0; i < 3; i += 1) {
@@ -564,10 +564,7 @@ DAT.Globe = function(container, opts) {
   }
 
   this.__defineSetter__('autospin', function(enabled) {
-    if (spinTimer != null) {
-      clearInterval(spinTimer);
-      spinTimer = null;
-    }
+    clearInterval(spinTimer);
     if (enabled) {
       spinTimer = setInterval( function() { rotate(0.0005); }, spinInterval);
     }
