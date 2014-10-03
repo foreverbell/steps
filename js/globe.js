@@ -544,10 +544,7 @@ DAT.Globe = function(container, opts) {
 
   function animate() {
     requestAnimationFrame(animate);
-    render();
-  }
 
-  function render() {
     zoom(curZoomSpeed);
 
     rotation.x += (target.x - rotation.x) * 0.1;
