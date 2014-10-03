@@ -23,7 +23,7 @@ See the `city.json` in `/data` as an example.
 
 # Example
 
-**Steps** can easily be ported to your blog, here is an example, see http://foreverbell.0ginr.com/steps/ .
+**Steps** can easily be ported to your blog, here is an example, see http://foreverbell.github.io/steps/ .
 
 # Local Test
 
