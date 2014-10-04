@@ -24,6 +24,7 @@ DAT.Globe = function(container, opts) {
     c.setHSL(hue, 1.0, 0.5);
     return c;
   };
+
   var imgDir = opts.imgDir || 'img/';
 
   var Shaders = {
@@ -71,31 +72,20 @@ DAT.Globe = function(container, opts) {
     }
   };
 
-  var camera, scene, renderer;
-  var atmosphereMesh, point, text, starfieldMesh, sphere;
-  var hollowCircle, focusCircles = [];
-  var pointMeshes = [];
-  var projector;
-  
-  var overRenderer;
-
-  var curZoomSpeed = 0;
-  var zoomSpeed = 50;
-  var spinInterval = 100;
-
-  var mouse = { x: 0, y: 0 }, mouseOnDown = { x: 0, y: 0 };
-  var rotation = { x: 0, y: 0 },
-  target = { x: Math.PI*3/2, y: Math.PI / 6.0 },
-  targetOnDown = { x: 0, y: 0 };
-
-  var distance = 10000, distanceTarget = 10000;
-  var PI_HALF = Math.PI / 2;
-
+  var camera, scene, renderer, projector;
+  var point, text, sphere, atmosphereMesh, starfieldMesh, pointMeshes = [];
+  var circleMesh, focusCircles = [], innerRadius;
   var cities = [], activeCity = -1;
-
+ 
+  var overRenderer = false;
+  var curZoomSpeed = 0, zoomSpeed = 50;
+  var spinInterval = 100;
+  var mouse = { x: 0, y: 0 }, mouseOnDown = { x: 0, y: 0 };
   var mouseDownOn = false;
-  var timer, circleTimer, spinTimer;
-  var innerRadius;
+  var rotation = { x: 0, y: 0 };
+  var target = { x: Math.PI*3/2, y: Math.PI / 6.0 }, targetOnDown = { x: 0, y: 0 };
+  var distance = 10000, distanceTarget = 10000;
+  var delayTimer, focusTimer, spinTimer;
 
   function init() {
 
@@ -168,10 +158,10 @@ DAT.Globe = function(container, opts) {
 
     // hollow-circle && focus-circle {{{
     geometry = new THREE.Geometry();
-    var i, NSEGMENTS = 32;
-    for (i = 0; i <= NSEGMENTS; i += 1) {
-      var x = Math.cos(i / NSEGMENTS * 2 * Math.PI);
-      var y = Math.sin(i / NSEGMENTS * 2 * Math.PI);
+    var i;
+    for (i = 0; i <= 32; i += 1) {
+      var x = Math.cos(i / 32 * 2 * Math.PI);
+      var y = Math.sin(i / 32 * 2 * Math.PI);
       var vertex = new THREE.Vector3(x, y, 0);
       geometry.vertices.push(vertex);
     }
@@ -179,9 +169,9 @@ DAT.Globe = function(container, opts) {
       color: 0xcccccc, 
       linewidth: 2 
     });
-    hollowCircle = new THREE.Line(geometry, material);
+    circleMesh = new THREE.Line(geometry, material);
     for (i = 0; i < 3; i += 1) {
-      focusCircles.push(hollowCircle.clone());
+      focusCircles.push(circleMesh.clone());
     }
     for (i = 0; i < 3; i += 1) {
       focusCircles[i].visible = false;
@@ -190,7 +180,7 @@ DAT.Globe = function(container, opts) {
     // }}}
     
     // starfield-background {{{
-    var texture = THREE.ImageUtils.loadTexture(imgDir + 'starfield.jpg');
+    var texture = THREE.ImageUtils.loadTexture(imgDir + 'starfield.png');
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(4, 4);
@@ -215,29 +205,23 @@ DAT.Globe = function(container, opts) {
     
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(w, h);
-
     renderer.domElement.style.position = 'absolute';
 
     container.appendChild(renderer.domElement);
 
     container.addEventListener('mousedown', onMouseDown, false);
-
     container.addEventListener('mousemove', onMouseMove, false);
-
     container.addEventListener('mousewheel', onMouseWheel, false);
-
-    document.addEventListener('keydown', onDocumentKeyDown, false);
-
-    window.addEventListener('resize', onWindowResize, false);
-
     container.addEventListener('mouseover', function() {
       overRenderer = true;
     }, false);
-
     container.addEventListener('mouseout', function() {
       overRenderer = false;
       clearActiveCity();
     }, false);
+    
+    document.addEventListener('keydown', onDocumentKeyDown, false);
+    window.addEventListener('resize', onWindowResize, false);
   }
 
   addData = function(data) {
@@ -388,7 +372,7 @@ DAT.Globe = function(container, opts) {
         focusCircles[i].scale.x = 1;
         focusCircles[i].scale.y = 1;
       }
-      clearInterval(circleTimer);
+      clearInterval(focusTimer);
     }
     activeCity = -1;
   }
@@ -410,7 +394,7 @@ DAT.Globe = function(container, opts) {
         focusCircles[i].lookAt(sphere.position);
       }
       innerRadius = 0;
-      circleTimer = setInterval( function() {
+      focusTimer = setInterval( function() {
         var i, radius = innerRadius;
         for (i = 0; i < 3; i += 1) {
           if (radius <= 12) {
@@ -458,13 +442,13 @@ DAT.Globe = function(container, opts) {
       target.x = targetOnDown.x + (mouse.x - mouseOnDown.x) * 0.005 * zoomDamp;
       target.y = targetOnDown.y + (mouse.y - mouseOnDown.y) * 0.005 * zoomDamp;
 
-      target.y = target.y > PI_HALF ? PI_HALF : target.y;
-      target.y = target.y < - PI_HALF ? - PI_HALF : target.y;
+      target.y = target.y > Math.PI/2 ? Math.PI/2 : target.y;
+      target.y = target.y < -Math.PI/2 ? -Math.PI/2 : target.y;
 
       clearActiveCity();
     } else {
-      clearTimeout(timer);
-      timer = setTimeout(function() {
+      clearTimeout(delayTimer);
+      delayTimer = setTimeout(function() {
         var intersectPoint = objectPick(event);
         if (intersectPoint !== null) {
           var city = findClosestCity(intersectPoint);
