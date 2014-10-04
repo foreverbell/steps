@@ -73,10 +73,11 @@ DAT.Globe = function(container, opts) {
   };
 
   var camera, scene, renderer, projector;
-  var point, text, sphere, atmosphereMesh, starfieldMesh, pointMeshes = [];
+  var sphere, point, text, atmosphereMesh, starfieldMesh;
+  var pointMesh = [], textMesh = [];
   var circleMesh, focusCircles = [], innerRadius;
   var cities = [], activeCity = -1;
- 
+
   var overRenderer = false;
   var curZoomSpeed = 0, zoomSpeed = 50;
   var spinInterval = 100;
@@ -150,16 +151,9 @@ DAT.Globe = function(container, opts) {
     scene.add(atmosphereMesh);
     // }}}
 
-    // point {{{
-    geometry = new THREE.CubeGeometry(0.75, 0.75, 1);
-    geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -0.5));
-    point = new THREE.Mesh(geometry);
-    /// }}}
-
     // hollow-circle && focus-circle {{{
     geometry = new THREE.Geometry();
-    var i;
-    for (i = 0; i <= 32; i += 1) {
+    for (var i = 0; i <= 32; i += 1) {
       var x = Math.cos(i / 32 * 2 * Math.PI);
       var y = Math.sin(i / 32 * 2 * Math.PI);
       var vertex = new THREE.Vector3(x, y, 0);
@@ -230,63 +224,41 @@ DAT.Globe = function(container, opts) {
     colorFnWrapper = function(data, i) { return colorFn(data[i][3]); }
     
     for (i = 0; i < data.length; i += 1) {
-      var subgeo = new THREE.Geometry();
-      
       city = data[i][0];
       lat = data[i][1];
       lng = data[i][2];
       color = colorFnWrapper(data, i);
       uri = data[i][4];
-
-      addCity(lat, lng, city, color, 1.5, 0, uri, subgeo, true);
-      
-      if (this._morphTargetId === undefined) {
-        this._morphTargetId = 0;
-      } else {
-        this._morphTargetId += 1;
-      }
-      morphName = 'morphTarget' + this._morphTargetId;
-      
-      var subgeoScaled = new THREE.Geometry();
-      addCity(lat, lng, city, color, 4, 1, uri, subgeoScaled, false);
-      subgeo.morphTargets.push({'name': morphName, vertices: subgeoScaled.vertices});
-      
-      var pointMesh = new THREE.Mesh(subgeo, new THREE.MeshBasicMaterial({
-          color: 0xffffff,
-          vertexColors: THREE.FaceColors,
-          morphTargets: true
-        }));
-      pointMeshes.push(pointMesh);
-      scene.add(pointMesh);
+   
+      addCity(lat, lng, city, color, uri);
+      pointMesh.push(point);
+      textMesh.push(text);
+      scene.add(point);
+      scene.add(text);
     }
   };
 
-  function addCity(lat, lng, city, color, scale, scaleText, uri, subgeo, record) {
+  function addCity(lat, lng, city, color, uri) {
+    var material = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        vertexColors: THREE.FaceColors
+      });
 
-    // point
-    var phi = (90 - lat) * Math.PI / 180;
-    var theta = (180 - lng) * Math.PI / 180;
+    var phi = (90 - lat) * Math.PI / 180, theta = (180 - lng) * Math.PI / 180;
 
+    var point3d = new THREE.CubeGeometry(1, 1, 0.5);
+    point = new THREE.Mesh(point3d, material);
+    
     point.position.x = 200 * Math.sin(phi) * Math.cos(theta);
     point.position.y = 200 * Math.cos(phi);
     point.position.z = 200 * Math.sin(phi) * Math.sin(theta);
-
     point.lookAt(sphere.position);
-
-    point.scale.x = scale;
-    point.scale.y = scale;
-    point.scale.z = 0.5;
-    point.updateMatrix();
 
     for (var i = 0; i < point.geometry.faces.length; i++) {
       point.geometry.faces[i].color = color;
     }
 
-    THREE.GeometryUtils.merge(subgeo, point);
-  
-    if (record) {
-      cities.push({'position': point.position.clone(), 'name': city, 'uri': uri});
-    }
+    cities.push({'position': point.position.clone(), 'name': city, 'uri': uri});
 
     // text
     var text3d = new THREE.TextGeometry(city, {
@@ -295,17 +267,14 @@ DAT.Globe = function(container, opts) {
       curveSegments: 2,
       font: 'helvetiker',
     });
-
-    text = new THREE.Mesh(text3d);
+    text = new THREE.Mesh(text3d, material);
 
     text.position.x = 200 * Math.sin(phi) * Math.cos(theta - Math.PI / 120);
     text.position.y = 200 * Math.cos(phi);
     text.position.z = 200 * Math.sin(phi) * Math.sin(theta - Math.PI / 120);
-
     text.position.multiplyScalar(1.001);
-
-    text.scale.x = scaleText;
-    text.scale.y = scaleText;
+    text.scale.x = 0;
+    text.scale.y = 0;
     text.updateMatrix();
 
     text.lookAt(text.position.clone().multiplyScalar(2));
@@ -314,16 +283,13 @@ DAT.Globe = function(container, opts) {
       text.geometry.faces[i].color = color;
     }
 
-    THREE.GeometryUtils.merge(subgeo, text);
+    text.visible = false;
   }
 
   function objectPick(event) {
     var vector = new THREE.Vector3((event.clientX / window.innerWidth) * 2 - 1, - (event.clientY / window.innerHeight) * 2 + 1, 0.5);
-
     projector.unprojectVector(vector, camera);
-
     var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
-
     var intersects = raycaster.intersectObject(sphere);
 
     if (intersects.length > 0) {
@@ -337,9 +303,9 @@ DAT.Globe = function(container, opts) {
     point.sub(sphere.position).normalize();
 
     var city;
-    var i, index = -1, best, dist;
+    var index = -1, best, dist;
 
-    for (i = 0; i < cities.length; i += 1) {
+    for (var i = 0; i < cities.length; i += 1) {
       city = cities[i].position.clone();
       city.sub(sphere.position).normalize();
       dist = city.dot(point);
@@ -358,16 +324,23 @@ DAT.Globe = function(container, opts) {
   function clearActiveCity() {
     if (activeCity !== -1) {
       var saved = activeCity;
-      var tween = new TWEEN.Tween({var: pointMeshes[activeCity].morphTargetInfluences[0]})
-        .to({var: 0}, 200)
+      var tween = new TWEEN.Tween( {scalePoint: 2, scaleText: 1} )
+        .to({scalePoint: 1, scaleText: 0}, 200)
         .easing(TWEEN.Easing.Cubic.EaseOut)
         .onUpdate( function() {
-          pointMeshes[saved].morphTargetInfluences[0] = this.var; 
+          pointMesh[saved].scale.x = this.scalePoint;
+          pointMesh[saved].scale.y = this.scalePoint;
+          textMesh[saved].scale.x = this.scaleText;
+          textMesh[saved].scale.y = this.scaleText;
+          pointMesh[saved].updateMatrix();
+          textMesh[saved].updateMatrix();
+        })
+        .onComplete( function() {
+          textMesh[saved].visible = false;
         })
         .start();
 
-      var i;
-      for (i = 0; i < 3; i += 1) {
+      for (var i = 0; i < 3; i += 1) {
         focusCircles[i].visible = false;
         focusCircles[i].scale.x = 1;
         focusCircles[i].scale.y = 1;
@@ -380,23 +353,28 @@ DAT.Globe = function(container, opts) {
   function setActiveCity(newCity) {
     activeCity = newCity;
     if (newCity !== -1) {
-      var tween = new TWEEN.Tween({var: pointMeshes[activeCity].morphTargetInfluences[0]})
-        .to({var: 1}, 200)
+      textMesh[newCity].visible = true;
+      var tween = new TWEEN.Tween( {scalePoint: 1, scaleText: 0} )
+        .to({scalePoint: 2, scaleText: 1}, 200)
         .easing(TWEEN.Easing.Cubic.EaseIn)
         .onUpdate( function() {
-          pointMeshes[newCity].morphTargetInfluences[0] = this.var;
+          pointMesh[newCity].scale.x = this.scalePoint;
+          pointMesh[newCity].scale.y = this.scalePoint;
+          textMesh[newCity].scale.x = this.scaleText;
+          textMesh[newCity].scale.y = this.scaleText;
+          pointMesh[newCity].updateMatrix();
+          textMesh[newCity].updateMatrix();
         })
         .start();
   
-      var i;
-      for (i = 0; i < 3; i += 1) {
+      for (var i = 0; i < 3; i += 1) {
         focusCircles[i].position = cities[activeCity].position;
         focusCircles[i].lookAt(sphere.position);
       }
       innerRadius = 0;
       focusTimer = setInterval( function() {
-        var i, radius = innerRadius;
-        for (i = 0; i < 3; i += 1) {
+        var radius = innerRadius;
+        for (var i = 0; i < 3; i += 1) {
           if (radius <= 12) {
             focusCircles[i].scale.x = radius / 4 + 1;
             focusCircles[i].scale.y = radius / 4 + 1;
@@ -408,7 +386,7 @@ DAT.Globe = function(container, opts) {
           innerRadius = 0;
         }
       }, 120);
-      for (i = 0; i < 3; i += 1) {
+      for (var i = 0; i < 3; i += 1) {
         focusCircles[i].visible = true;
       }
     }
